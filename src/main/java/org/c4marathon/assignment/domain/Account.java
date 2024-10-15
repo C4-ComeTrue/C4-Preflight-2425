@@ -1,6 +1,9 @@
 package org.c4marathon.assignment.domain;
 
 import java.time.Instant;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +18,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "account")
 public class Account {
@@ -54,4 +58,13 @@ public class Account {
     @Column(name = "recent_transaction_date")
     private Instant recentTransactionDate;
 
+    public Account(String accountNumber, Integer userId, Character accountType, String memo, Long balance, Instant createDate, Instant recentTransactionDate) {
+        this.accountNumber = accountNumber;
+        this.userId = userId;
+        this.accountType = accountType;
+        this.memo = memo;
+        this.balance = balance;
+        this.createDate = createDate;
+        this.recentTransactionDate = recentTransactionDate;
+    }
 }
