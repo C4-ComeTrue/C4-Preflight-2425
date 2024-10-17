@@ -31,7 +31,7 @@ public class Mail {
 	@Column(nullable = false)
 	private Long userId;
 
-	@Column
+	@Column(nullable = false)
 	private Long accountId;
 
 	@Builder
