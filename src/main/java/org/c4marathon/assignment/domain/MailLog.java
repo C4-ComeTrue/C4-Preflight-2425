@@ -19,12 +19,12 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "maillog_hellozo0")
+@Table(name = "mail_log_hellozo0")
 public class MailLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "miallog_id", nullable = false)
+    @Column(name = "mial_log_id", nullable = false)
     private Integer id;
 
     @NotNull
@@ -40,7 +40,7 @@ public class MailLog {
     private MailStatus status;
 
     @Size(max = 500)
-    @Column(name = "contet", length = 500)
+    @Column(name = "content", length = 500)
     private String content;
 
     @NotNull
