@@ -2,18 +2,18 @@ package org.c4marathon.assignment.user.domain;
 
 import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
+import org.c4marathon.assignment.user.infrastructure.UserJpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class UserRepository {
-	private final CrudRepository<User, Integer> userCrudRepository;
+	private final UserJpaRepository userJpaRepository;
 
-	public UserRepository(CrudRepository<User, Integer> userCrudRepository) {
-		this.userCrudRepository = userCrudRepository;
+	public UserRepository(UserJpaRepository userJpaRepository) {
+		this.userJpaRepository = userJpaRepository;
 	}
 
 	public Optional<User> findById(int id) {
-		return userCrudRepository.findById(id);
+		return userJpaRepository.findById(id);
 	}
 }

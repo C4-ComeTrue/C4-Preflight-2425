@@ -29,13 +29,13 @@ public class Mail {
 	private LocalDateTime sendTime;
 
 	@Column(nullable = false)
-	private Long userId;
+	private int userId;
 
 	@Column(nullable = false)
-	private Long accountId;
+	private int accountId;
 
 	@Builder
-	public Mail(LocalDateTime requestTime, LocalDateTime sendTime, Long userId, Long accountId) {
+	public Mail(LocalDateTime requestTime, LocalDateTime sendTime, int userId, int accountId) {
 		this.requestTime = requestTime;
 		this.sendTime = sendTime;
 		this.userId = userId;

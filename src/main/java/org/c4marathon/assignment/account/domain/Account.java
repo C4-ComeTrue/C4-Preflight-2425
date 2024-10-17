@@ -25,7 +25,7 @@ public class Account {
 	private String accountNumber;
 
 	@Column(name = "user_id", nullable = false)
-	private long userId;
+	private int userId;
 
 	@Column(name = "account_type", nullable = false)
 	private char accountType;

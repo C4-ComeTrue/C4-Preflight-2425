@@ -1,17 +1,17 @@
 package org.c4marathon.assignment.mail.domain;
 
-import org.springframework.data.repository.CrudRepository;
+import org.c4marathon.assignment.mail.infrastructure.MailJpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class MailRepository {
-	private final CrudRepository<Mail, Long> mailCrudRepository;
+	private final MailJpaRepository mailJpaRepository; // JPA와 연결 끊는 것도 고민
 
-	protected MailRepository(CrudRepository<Mail, Long> mailCrudRepository) {
-		this.mailCrudRepository = mailCrudRepository;
+	protected MailRepository(MailJpaRepository mailJpaRepository) {
+		this.mailJpaRepository = mailJpaRepository;
 	}
 
 	public Mail saveMail(Mail mail) {
-		return mailCrudRepository.save(mail);
+		return mailJpaRepository.save(mail);
 	}
 }
