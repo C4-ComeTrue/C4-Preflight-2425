@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.c4marathon.assignment.model.MailStatus;
+import org.c4marathon.assignment.domain.model.MailStatus;
 
 import java.time.Instant;
 

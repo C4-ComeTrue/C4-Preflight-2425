@@ -1,4 +1,4 @@
-package org.c4marathon.assignment.model;
+package org.c4marathon.assignment.domain.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
