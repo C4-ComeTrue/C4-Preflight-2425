@@ -21,6 +21,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class MailService {
+    private static final String SUBJECT = "계좌 상품 설명서";
 
     private final JavaMailSender javaMailSender;
     private final MailRepository mailRepository;
@@ -45,6 +46,7 @@ public class MailService {
                 MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
                 mimeMessageHelper.setTo(mailArchive.getEmail());
+                mimeMessageHelper.setSubject(SUBJECT);
                 mimeMessageHelper.setText(mailArchive.getContent());
                 javaMailSender.send(mimeMessage);
 
