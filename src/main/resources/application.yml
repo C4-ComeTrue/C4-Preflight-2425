@@ -16,5 +16,6 @@ spring:
     show-sql: true
 
 mail:
+  email: ${MAIL_EMAIL}
   username: ${MAIL_USERNAME}
   password: ${MAIL_PASSWORD}
