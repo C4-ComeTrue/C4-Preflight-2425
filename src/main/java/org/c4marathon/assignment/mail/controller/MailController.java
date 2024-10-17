@@ -20,4 +20,11 @@ public class MailController {
         mailService.saveMailRequest(request);
         return ResponseEntity.ok().build();
     }
+
+
+    @PostMapping("/re-send")
+    public ResponseEntity<Void> resendMail() {
+        mailService.resendMail();
+        return ResponseEntity.ok().build();
+    }
 }
