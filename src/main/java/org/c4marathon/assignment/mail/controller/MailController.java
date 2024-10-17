@@ -1,7 +1,7 @@
 package org.c4marathon.assignment.mail.controller;
 
 import org.c4marathon.assignment.mail.application.MailService;
-import org.c4marathon.assignment.mail.dto.CreateMailDto;
+import org.c4marathon.assignment.mail.dto.CreateMailRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +18,8 @@ public class MailController {
 	}
 
 	@PostMapping("/account-create") // 메일함에 쌓아두는 용도
-	public ResponseEntity<Boolean> createMail(@RequestBody CreateMailDto createMailDto) {
-		boolean isCreated = mailService.createMail(createMailDto);
+	public ResponseEntity<Boolean> createMail(@RequestBody CreateMailRequestDto createMailRequestDto) {
+		boolean isCreated = mailService.createMail(createMailRequestDto);
 
 		return ResponseEntity.ok(isCreated);
 	}
