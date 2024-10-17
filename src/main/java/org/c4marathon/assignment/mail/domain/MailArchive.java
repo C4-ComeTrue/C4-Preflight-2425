@@ -40,7 +40,7 @@ public class MailArchive {
         this.accountId = accountId;
         this.email = email;
         this.content = content;
-        this.status = MailStatus.PENDING;
+        this.status = status;
         this.requestTime = requestTime;
     }
 
