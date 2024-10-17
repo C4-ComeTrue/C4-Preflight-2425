@@ -14,3 +14,7 @@ spring:
         format_sql: true
     open-in-view: false
     show-sql: true
+
+mail:
+  username: ${MAIL_USERNAME}
+  password: ${MAIL_PASSWORD}
