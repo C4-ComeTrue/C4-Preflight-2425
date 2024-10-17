@@ -23,3 +23,6 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+logging:
+  level:
+    root: INFO   # 기본 로그 레벨 설정 (DEBUG로 변경 가능)
