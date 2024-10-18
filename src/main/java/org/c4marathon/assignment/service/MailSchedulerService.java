@@ -44,10 +44,10 @@ public class MailSchedulerService {
             mimeMessageHelper.setText(form.content(), false);
             javaMailSender.send(mimeMessage);
 
-            mailLog.sendSuccess(MailStatus.SUCCESS, Instant.now());
+            mailLog.updateSuccess(MailStatus.SUCCESS, Instant.now());
 
         } catch (Exception e) {
-            mailLog.sendFail(MailStatus.FAIL, Instant.now(), mailLog.getCountRT()+1);
+            mailLog.updateFail(MailStatus.FAIL, Instant.now(), mailLog.getCountRT()+1);
             log.error("Mail send failed,  mailLogId: {}. Error: {}", form.mailLogId(), e.getMessage(), e);
         }
 

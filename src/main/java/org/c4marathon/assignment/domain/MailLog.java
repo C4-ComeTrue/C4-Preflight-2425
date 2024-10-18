@@ -67,12 +67,12 @@ public class MailLog {
         this.countRT = countRT;
     }
 
-    public void sendSuccess(MailStatus status, Instant updateTime){
+    public void updateSuccess(MailStatus status, Instant updateTime){
         this.status = status;
         this.updateTime = updateTime;
     }
 
-    public void sendFail(MailStatus status, Instant updateTime, Integer countRT){
+    public void updateFail(MailStatus status, Instant updateTime, Integer countRT){
         this.status = status;
         this.updateTime = updateTime;
         this.countRT = countRT;
