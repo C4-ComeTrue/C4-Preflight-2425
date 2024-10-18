@@ -15,8 +15,6 @@ spring:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
-
-
   mail:
     host: smtp.gmail.com
     port: 587
