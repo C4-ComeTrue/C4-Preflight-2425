@@ -11,14 +11,14 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import org.c4marathon.assignment.domain.model.MailStatus;
 
 import java.time.Instant;
 
-@Getter
-@Setter
 @Entity
+@Getter
+@NoArgsConstructor
 @Table(name = "mail_log_hellozo0")
 public class MailLog {
 
@@ -51,4 +51,17 @@ public class MailLog {
     @Column(name = "update_time", nullable = false)
     private Instant updateTime;
 
+    @NotNull
+    @Column(name = "count_RT")
+    private Integer countRT;
+
+    public MailLog(Integer userId, String email, MailStatus status, String content, Instant createTime, Instant updateTime, Integer countRT) {
+        this.userId = userId;
+        this.email = email;
+        this.status = status;
+        this.content = content;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+        this.countRT = countRT;
+    }
 }
