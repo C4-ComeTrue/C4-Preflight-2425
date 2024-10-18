@@ -56,7 +56,7 @@ public class MailSchedulerService {
 
     @Scheduled(cron = "0 * * * * *")
     protected void mailSendScheduler() {
-        List<MailLog> mailLogs = mailLogRepository.findMailLogsByStatusIn(Arrays.asList(MailStatus.PENDING, MailStatus.FAIL));
+        List<MailLog> mailLogs = mailLogRepository.findMailLogsByStatusIn(List.of(MailStatus.PENDING, MailStatus.FAIL));
 
         for (MailLog mailLog : mailLogs) {
             handleMailSending(new MailForm(mailLog.getId(), mailLog.getEmail(), MAIL_SUBJECT, mailLog.getContent()));
