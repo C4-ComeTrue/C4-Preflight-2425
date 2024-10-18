@@ -64,4 +64,17 @@ public class MailLog {
         this.updateTime = updateTime;
         this.countRT = countRT;
     }
+
+    public void sendSuccess(MailStatus status, Instant updateTime){
+        this.status = status;
+        this.updateTime = updateTime;
+    }
+
+    public void sendFail(MailStatus status, Instant updateTime, Integer countRT){
+        this.status = status;
+        this.updateTime = updateTime;
+        this.countRT = countRT;
+
+        if(countRT >= 5) this.status = MailStatus.PERMANENT_FAIL;
+    }
 }
