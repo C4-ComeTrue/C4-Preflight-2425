@@ -19,13 +19,7 @@ public class MailController {
     @PostMapping("/send")
     public ResponseEntity<Void> sendMail(@RequestBody @Valid MailRequest request) {
         mailService.saveMailRequest(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-
-    @PostMapping("/re-send")
-    public ResponseEntity<Void> resendMail() {
-        mailService.resendMail();
-        return ResponseEntity.ok().build();
-    }
 }

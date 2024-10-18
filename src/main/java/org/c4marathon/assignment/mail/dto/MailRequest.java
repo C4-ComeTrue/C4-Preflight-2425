@@ -1,16 +1,17 @@
 package org.c4marathon.assignment.mail.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 public record MailRequest(
         @NotNull
+        @Positive
         Long accountId,
 
-        @NotNull
+        @NotBlank
+        @Email
         String email,
 
-        @NotNull
+        @NotBlank
         @Size(min = 10, max = 500)
         String content
 ) {

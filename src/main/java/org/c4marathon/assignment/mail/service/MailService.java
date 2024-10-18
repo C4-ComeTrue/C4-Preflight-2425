@@ -29,15 +29,38 @@ public class MailService {
 
     @Scheduled(cron = "0 * * * * ?")
     public void sendMail() {
-        log.info("메일 전송 실행");
-        List<MailArchive> pendingMail = mailRepository.findMailArchiveByMailStatus(PENDING);
-        sendMailForStatus(pendingMail);
-    }
+        log.debug("메일 전송 실행");
+        while (true) {
+            List<MailArchive> pendingMail = mailRepository.findMailArchiveByStatusIn(List.of(PENDING, FAIL));
+            List<MailArchive> filteringMail = pendingMail.stream()
+                    .filter(m -> m.getRetryCount() <= 3)
+                    .toList();
 
-    public void resendMail() {
-        log.info("전송 실패 메일 재전송");
-        List<MailArchive> failMail = mailRepository.findMailArchiveByMailStatus(FAIL);
-        sendMailForStatus(failMail);
+            if (filteringMail.isEmpty()) {
+                break;
+            }
+            for (MailArchive mailArchive : filteringMail) {
+
+                try {
+                    MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+                    MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+                    mimeMessageHelper.setTo(mailArchive.getEmail());
+                    mimeMessageHelper.setSubject(SUBJECT);
+                    mimeMessageHelper.setText(mailArchive.getContent());
+                    javaMailSender.send(mimeMessage);
+
+                    mailArchive.changeStatusSent();
+                    mailRepository.save(mailArchive);
+
+                } catch (MessagingException e) {
+                    mailArchive.changeStatusFail();
+                    mailArchive.plusRetryCount();
+                    mailRepository.save(mailArchive);
+                    log.debug("메일 전송 실패", e);
+                }
+            }
+        }
     }
 
     public void saveMailRequest(MailRequest request) {
@@ -49,28 +72,5 @@ public class MailService {
         );
 
         mailRepository.save(mailArchive);
-    }
-
-    private void sendMailForStatus(List<MailArchive> pendingMail) {
-        for (MailArchive mailArchive : pendingMail) {
-            try {
-                MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-                MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
-                mimeMessageHelper.setTo(mailArchive.getEmail());
-                mimeMessageHelper.setSubject(SUBJECT);
-                mimeMessageHelper.setText(mailArchive.getContent());
-                javaMailSender.send(mimeMessage);
-
-                mailArchive.changeStatusSent();
-                mailArchive.setSentTime();
-
-                mailRepository.save(mailArchive);
-            } catch (MessagingException e) {
-                mailArchive.changeStatusFail();
-                mailRepository.save(mailArchive);
-                log.error("메일 전송 실패");
-            }
-        }
     }
 }

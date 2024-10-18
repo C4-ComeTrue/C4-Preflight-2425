@@ -26,10 +26,13 @@ public class MailArchive {
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String content;
 
     @Enumerated(EnumType.STRING)
     private MailStatus status;
+
+    private int retryCount;
 
     private LocalDateTime requestTime;
 
@@ -56,13 +59,14 @@ public class MailArchive {
 
     public void changeStatusSent() {
         this.status = MailStatus.SENT;
+        this.sentTime = LocalDateTime.now();
     }
     public void changeStatusFail() {
         this.status = MailStatus.FAIL;
     }
 
-    public void setSentTime() {
-        this.sentTime = LocalDateTime.now();
-
+    public void plusRetryCount() {
+        this.retryCount++;
     }
+
 }
