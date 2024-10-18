@@ -1,5 +1,6 @@
 package org.c4marathon.assignment.mail.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.c4marathon.assignment.mail.dto.MailRequest;
 import org.c4marathon.assignment.mail.service.MailService;
@@ -16,7 +17,7 @@ public class MailController {
     private final MailService mailService;
 
     @PostMapping("/send")
-    public ResponseEntity<Void> sendMail(@RequestBody MailRequest request) {
+    public ResponseEntity<Void> sendMail(@RequestBody @Valid MailRequest request) {
         mailService.saveMailRequest(request);
         return ResponseEntity.ok().build();
     }
