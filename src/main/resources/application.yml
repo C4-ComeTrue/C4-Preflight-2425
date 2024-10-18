@@ -19,3 +19,4 @@ mail:
   email: ${MAIL_EMAIL}
   username: ${MAIL_USERNAME}
   password: ${MAIL_PASSWORD}
+  debug: ${MAIL_DEBUG}
