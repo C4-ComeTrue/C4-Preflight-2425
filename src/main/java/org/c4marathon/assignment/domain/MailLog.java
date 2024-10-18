@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -41,6 +42,7 @@ public class MailLog {
 
     @Size(max = 500)
     @Column(name = "content", length = 500)
+    @NotBlank
     private String content;
 
     @NotNull
