@@ -57,6 +57,17 @@ public class MailLog {
     @Column(name = "count_RT")
     private Integer countRT;
 
+    public MailLog(Integer id, Integer userId, String email, MailStatus status, String content, Instant createTime, Instant updateTime, Integer countRT) {
+        this.id = id;
+        this.userId = userId;
+        this.email = email;
+        this.status = status;
+        this.content = content;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+        this.countRT = countRT;
+    }
+
     public MailLog(Integer userId, String email, MailStatus status, String content, Instant createTime, Instant updateTime, Integer countRT) {
         this.userId = userId;
         this.email = email;
@@ -67,16 +78,4 @@ public class MailLog {
         this.countRT = countRT;
     }
 
-    public void updateSuccess(MailStatus status, Instant updateTime){
-        this.status = status;
-        this.updateTime = updateTime;
-    }
-
-    public void updateFail(MailStatus status, Instant updateTime, Integer countRT){
-        this.status = status;
-        this.updateTime = updateTime;
-        this.countRT = countRT;
-
-        if(countRT >= 5) this.status = MailStatus.PERMANENT_FAIL;
-    }
 }

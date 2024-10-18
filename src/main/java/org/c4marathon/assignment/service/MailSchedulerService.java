@@ -1,11 +1,9 @@
 package org.c4marathon.assignment.service;
 
 import jakarta.mail.internet.MimeMessage;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.c4marathon.assignment.controller.request.MailSchedulerRequest;
-import org.c4marathon.assignment.domain.model.MailForm;
 import org.c4marathon.assignment.domain.MailLog;
 import org.c4marathon.assignment.domain.model.MailStatus;
 import org.c4marathon.assignment.repository.MailLogRepository;
@@ -16,7 +14,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -33,25 +30,27 @@ public class MailSchedulerService {
     }
 
     @Async("customAsyncExecutor")
-    protected void handleMailSending(MailForm form){
+    protected void handleMailSending(MailLog mailLog){
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MailLog mailLog = mailLogRepository.findById(form.mailLogId()).orElseThrow(() -> new EntityNotFoundException("MailLog not found"));
+        MailLog changedMailLog;
 
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-            mimeMessageHelper.setTo(form.to());
-            mimeMessageHelper.setSubject(form.subject());
-            mimeMessageHelper.setText(form.content(), false);
+            mimeMessageHelper.setTo(mailLog.getEmail());
+            mimeMessageHelper.setSubject(MAIL_SUBJECT);
+            mimeMessageHelper.setText(mailLog.getContent(), false);
             javaMailSender.send(mimeMessage);
-
-            mailLog.updateSuccess(MailStatus.SUCCESS, Instant.now());
+            changedMailLog = new MailLog(mailLog.getId(), mailLog.getUserId(), mailLog.getEmail(), MailStatus.SUCCESS, mailLog.getContent(), mailLog.getCreateTime(), Instant.now(), mailLog.getCountRT());
 
         } catch (Exception e) {
-            mailLog.updateFail(MailStatus.FAIL, Instant.now(), mailLog.getCountRT()+1);
-            log.error("Mail send failed,  mailLogId: {}. Error: {}", form.mailLogId(), e.getMessage(), e);
+            MailStatus status = MailStatus.FAIL;
+            if(mailLog.getCountRT() >= 3) status = MailStatus.PERMANENT_FAIL;
+
+            changedMailLog = new MailLog(mailLog.getId(), mailLog.getUserId(), mailLog.getEmail(), status, mailLog.getContent(), mailLog.getCreateTime(), Instant.now(), mailLog.getCountRT()+1);
+            log.error("Mail send failed,  mailLogId: {}. Error: {}", mailLog.getId(), e.getMessage(), e);
         }
 
-        mailLogRepository.save(mailLog);
+        mailLogRepository.save(changedMailLog);
     }
 
     @Scheduled(cron = "0 * * * * *")
@@ -59,7 +58,7 @@ public class MailSchedulerService {
         List<MailLog> mailLogs = mailLogRepository.findMailLogsByStatusIn(List.of(MailStatus.PENDING, MailStatus.FAIL));
 
         for (MailLog mailLog : mailLogs) {
-            handleMailSending(new MailForm(mailLog.getId(), mailLog.getEmail(), MAIL_SUBJECT, mailLog.getContent()));
+            handleMailSending(mailLog);
         }
     }
 }
