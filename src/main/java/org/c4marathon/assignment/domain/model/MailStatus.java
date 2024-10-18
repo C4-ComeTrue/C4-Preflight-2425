@@ -8,5 +8,6 @@ import lombok.RequiredArgsConstructor;
 public enum MailStatus {
     PENDING,
     SUCCESS,
-    FAIL
+    FAIL,
+    PERMANENT_FAIL
 }
