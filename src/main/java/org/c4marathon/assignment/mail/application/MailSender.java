@@ -1,6 +1,6 @@
 package org.c4marathon.assignment.mail.application;
 
-import org.c4marathon.assignment.mail.dto.UserInfoDto;
+import org.c4marathon.assignment.mail.dto.MailInfoToSendDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -20,16 +20,22 @@ public class MailSender {
 		this.javaMailSender = javaMailSender;
 	}
 
-	public void sendAccountCreateMsg(UserInfoDto userInfo) throws MessagingException {
-		MimeMessage message = getMessage(userInfo);
-		message.setSubject("계좌 생성이 완료되었습니다!");
-		message.setText(userInfo.nickname() + "님, 계좌 생성이 완료되었습니다!");
+	public void sendAccountCreateMsg(MailInfoToSendDto mailInfoDto) {
+		try {
+			MimeMessage message = getMessage(mailInfoDto);
+			message.setSubject("계좌 생성이 완료되었습니다!");
+			message.setText(mailInfoDto.getUserNickname() + "님, 계좌 생성이 완료되었습니다! \n생성 계좌: " + mailInfoDto.getAccountNumber());
+
+			javaMailSender.send(message);
+		} catch (MessagingException e) {
+			throw new RuntimeException("메일 작성 중 에러", e); // TODO: 메일 에러로 전환
+		}
 	}
 
-	private MimeMessage getMessage(UserInfoDto userInfo) throws MessagingException {
+	private MimeMessage getMessage(MailInfoToSendDto mailInfoDto) throws MessagingException {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-		mimeMessage.addRecipients(Message.RecipientType.TO, userInfo.email());
+		mimeMessage.addRecipients(Message.RecipientType.TO, mailInfoDto.getUserEmail());
 		mimeMessage.setFrom(email);
 
 		return mimeMessage;
