@@ -1,5 +1,6 @@
 package org.c4marathon.assignment.mail.domain;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.c4marathon.assignment.mail.dto.MailInfoToSendDto;
@@ -20,5 +21,9 @@ public class MailRepository {
 
 	public List<MailInfoToSendDto> findAllToSend(int size) {
 		return mailJpaRepository.findAllToSendLimit(size);
+	}
+
+	public void updateSendTime(List<Long> ids) {
+		mailJpaRepository.updateSendTime(LocalDateTime.now(), ids);
 	}
 }
