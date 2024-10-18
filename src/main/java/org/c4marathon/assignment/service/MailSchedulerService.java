@@ -3,6 +3,7 @@ package org.c4marathon.assignment.service;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.c4marathon.assignment.config.AsyncConfig;
 import org.c4marathon.assignment.controller.request.MailSchedulerRequest;
 import org.c4marathon.assignment.domain.model.MailForm;
 import org.c4marathon.assignment.domain.MailLog;
@@ -24,13 +25,14 @@ import java.util.List;
 public class MailSchedulerService {
     private final MailLogRepository mailLogRepository;
     private final JavaMailSender javaMailSender;
+    private final AsyncConfig asyncConfig;
     private static final String MAIL_SUBJECT = "계좌생성되었습니다";
 
     public void mailLogging(MailSchedulerRequest request) {
         mailLogRepository.save(new MailLog(request.userId(), request.email(), MailStatus.valueOf("PENDING"), request.content(), Instant.now(),Instant.now(), 0));
     }
 
-    @Async
+    @Async("customAsyncExecutor")
     protected void handleMailSending(MailForm form){
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MailLog mailLog = mailLogRepository.findById(form.mailLogId()).orElseThrow(() -> new EntityNotFoundException("MailLog not found"));
