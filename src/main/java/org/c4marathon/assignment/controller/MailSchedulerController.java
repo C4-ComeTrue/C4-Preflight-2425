@@ -1,5 +1,6 @@
 package org.c4marathon.assignment.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.c4marathon.assignment.controller.request.MailSchedulerRequest;
 import org.c4marathon.assignment.service.MailSchedulerService;
@@ -20,7 +21,7 @@ public class MailSchedulerController {
      * Step 1. 메일 전송 요청을 남기는 API 입니다.
      */
     @PostMapping("/mail")
-    public void postMailScheduler(@RequestBody MailSchedulerRequest request) {
+    public void postMailScheduler(@RequestBody @Valid MailSchedulerRequest request) {
         mailSchedulerService.mailLogging(request);
     }
 
