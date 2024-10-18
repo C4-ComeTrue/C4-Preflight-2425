@@ -15,6 +15,7 @@ public interface MailJpaRepository extends JpaRepository<Mail, Long> {
 		FROM mail_zzamba m
 		JOIN user u ON m.user_id = u.user_id
 		JOIN account a ON a.account_id = m.account_id
+		WHERE m.send_time IS NULL
 		LIMIT :limitSize
 		""", nativeQuery = true)
 	List<MailInfoToSendDto> findAllToSendLimit(int limitSize);

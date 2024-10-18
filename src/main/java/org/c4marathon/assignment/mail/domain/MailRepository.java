@@ -6,6 +6,7 @@ import java.util.List;
 import org.c4marathon.assignment.mail.dto.MailInfoToSendDto;
 import org.c4marathon.assignment.mail.infrastructure.MailJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class MailRepository {
@@ -23,6 +24,7 @@ public class MailRepository {
 		return mailJpaRepository.findAllToSendLimit(size);
 	}
 
+	@Transactional
 	public void updateSendTime(List<Long> ids) {
 		mailJpaRepository.updateSendTime(LocalDateTime.now(), ids);
 	}
