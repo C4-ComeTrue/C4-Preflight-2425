@@ -24,7 +24,11 @@ public class MailSender {
 		try {
 			MimeMessage message = getMessage(mailInfoDto);
 			message.setSubject("계좌 생성이 완료되었습니다!");
-			message.setText(mailInfoDto.getUserNickname() + "님, 계좌 생성이 완료되었습니다! \n생성 계좌: " + mailInfoDto.getAccountNumber());
+			message.setText("""
+				%s님, 계좌 생성이 완료되었습니다!
+				생성 계좌: %s
+				""".formatted(mailInfoDto.getUserNickname(), mailInfoDto.getAccountNumber())
+			);
 
 			javaMailSender.send(message);
 		} catch (MessagingException e) {

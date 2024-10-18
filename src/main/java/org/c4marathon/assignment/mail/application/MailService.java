@@ -47,7 +47,7 @@ public class MailService {
 
 	@Scheduled(cron = "0 * * * * *")
 	public void sendMail() {
-		log.info("배치 작업 활성화");
+		log.debug("배치 작업 활성화");
 
 		List<MailInfoToSendDto> mailsToSend = mailRepository.findAllToSend(MAX_SEND_SIZE);
 		List<Long> sentMailIds = new ArrayList<>();
@@ -64,7 +64,7 @@ public class MailService {
 
 		mailRepository.updateSendTime(sentMailIds);
 
-		log.info("배치 작업 정상 종료");
+		log.debug("배치 작업 정상 종료");
 	}
 
 }

@@ -3,6 +3,7 @@ package org.c4marathon.assignment.mail.controller;
 import org.c4marathon.assignment.mail.application.MailService;
 import org.c4marathon.assignment.mail.dto.CreateMailRequestDto;
 import org.c4marathon.assignment.mail.dto.CreateMailResponseDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,6 @@ public class MailController {
 	public ResponseEntity<CreateMailResponseDto> createMail(@RequestBody CreateMailRequestDto createMailRequestDto) {
 		CreateMailResponseDto responseDto = mailService.createMail(createMailRequestDto);
 
-		return ResponseEntity.ok(responseDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
 	}
 }
