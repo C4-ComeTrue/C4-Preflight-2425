@@ -3,7 +3,7 @@ package org.c4marathon.assignment.service;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.c4marathon.assignment.config.AsyncConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.c4marathon.assignment.controller.request.MailSchedulerRequest;
 import org.c4marathon.assignment.domain.model.MailForm;
 import org.c4marathon.assignment.domain.MailLog;
@@ -22,6 +22,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @EnableAsync
+@Slf4j
 public class MailSchedulerService {
     private final MailLogRepository mailLogRepository;
     private final JavaMailSender javaMailSender;
@@ -47,6 +48,7 @@ public class MailSchedulerService {
 
         } catch (Exception e) {
             mailLog.sendFail(MailStatus.FAIL, Instant.now(), mailLog.getCountRT()+1);
+            log.error("Mail send failed,  mailLogId: {}. Error: {}", form.mailLogId(), e.getMessage(), e);
         }
 
         mailLogRepository.save(mailLog);
