@@ -25,7 +25,6 @@ import java.util.List;
 public class MailSchedulerService {
     private final MailLogRepository mailLogRepository;
     private final JavaMailSender javaMailSender;
-    private final AsyncConfig asyncConfig;
     private static final String MAIL_SUBJECT = "계좌생성되었습니다";
 
     public void mailLogging(MailSchedulerRequest request) {
