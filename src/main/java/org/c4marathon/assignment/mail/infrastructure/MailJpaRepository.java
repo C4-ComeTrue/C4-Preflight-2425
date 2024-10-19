@@ -11,10 +11,11 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface MailJpaRepository extends JpaRepository<Mail, Long> {
 	@Query(value = """
-			SELECT m.id mailId, a.account_number accountNumber, u.email userEmail, u.nickname userNickname
+			SELECT m.id mailId, a.account_number accountNumber, m.email userPreEmail,
+			       u.email userRecentEmail, u.nickname userNickname
 			FROM mail_zzamba m
-			JOIN user u ON m.user_id = u.user_id
-			JOIN account a ON a.account_id = m.account_id
+			LEFT JOIN user u ON m.user_id = u.user_id
+			LEFT JOIN account a ON m.account_id = a.account_id
 			WHERE m.send_time IS NULL
 			LIMIT :limitSize
 		""", nativeQuery = true)

@@ -1,5 +1,7 @@
 package org.c4marathon.assignment.mail.application;
 
+import java.util.Objects;
+
 import org.c4marathon.assignment.mail.dto.MailInfoToSendDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -39,7 +41,10 @@ public class MailSender {
 	private MimeMessage getMessage(MailInfoToSendDto mailInfoDto) throws MessagingException {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-		mimeMessage.addRecipients(Message.RecipientType.TO, mailInfoDto.getUserEmail());
+		String userEmail = Objects.isNull(mailInfoDto.getUserRecentEmail()) ? mailInfoDto.getUserPreEmail() :
+			mailInfoDto.getUserRecentEmail();
+
+		mimeMessage.addRecipients(Message.RecipientType.TO, userEmail);
 		mimeMessage.setFrom(email);
 
 		return mimeMessage;
