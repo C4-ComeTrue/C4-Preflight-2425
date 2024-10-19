@@ -29,15 +29,19 @@ public class Mail {
 	private LocalDateTime sendTime;
 
 	@Column(nullable = false)
+	private String email;
+
+	@Column(nullable = false)
 	private int userId;
 
 	@Column(nullable = false)
 	private int accountId;
 
 	@Builder
-	public Mail(LocalDateTime requestTime, LocalDateTime sendTime, int userId, int accountId) {
+	public Mail(LocalDateTime requestTime, LocalDateTime sendTime, String email, int userId, int accountId) {
 		this.requestTime = requestTime;
 		this.sendTime = sendTime;
+		this.email = email;
 		this.userId = userId;
 		this.accountId = accountId;
 	}

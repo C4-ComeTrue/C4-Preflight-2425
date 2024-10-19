@@ -1,19 +1,23 @@
 package org.c4marathon.assignment.mail.application;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.c4marathon.assignment.account.domain.Account;
 import org.c4marathon.assignment.account.domain.AccountRepository;
 import org.c4marathon.assignment.mail.domain.Mail;
 import org.c4marathon.assignment.mail.domain.MailRepository;
 import org.c4marathon.assignment.mail.dto.CreateMailRequestDto;
 import org.c4marathon.assignment.mail.dto.CreateMailResponseDto;
 import org.c4marathon.assignment.mail.dto.MailInfoToSendDto;
+import org.c4marathon.assignment.user.domain.User;
 import org.c4marathon.assignment.user.domain.UserRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,10 +41,17 @@ public class MailService {
 
 	@Transactional
 	public CreateMailResponseDto createMail(CreateMailRequestDto requestDto) {
-		accountRepository.findById(requestDto.accountId()).orElseThrow(() -> new RuntimeException("해당 계좌를 찾을 수 없습니다."));
-		userRepository.findById(requestDto.userId()).orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+		Account account = accountRepository.findById(requestDto.accountId())
+			.orElseThrow(() -> new EntityNotFoundException("해당 계좌를 찾을 수 없습니다."));
+		User user = userRepository.findById(requestDto.userId())
+			.orElseThrow(() -> new EntityNotFoundException("해당 사용자를 찾을 수 없습니다."));
 
-		Mail mail = requestDto.toMail();
+		Mail mail = Mail.builder()
+			.requestTime(LocalDateTime.now())
+			.userId(user.getId())
+			.accountId(account.getId())
+			.email(user.getEmail())
+			.build();
 		Mail savedMail = mailRepository.saveMail(mail);
 
 		return CreateMailResponseDto.from(savedMail);
