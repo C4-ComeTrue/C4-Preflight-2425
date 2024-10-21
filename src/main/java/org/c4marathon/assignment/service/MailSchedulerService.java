@@ -23,10 +23,10 @@ import java.util.List;
 public class MailSchedulerService {
     private final MailLogRepository mailLogRepository;
     private final JavaMailSender javaMailSender;
-    private static final String MAIL_SUBJECT = "계좌생성되었습니다";
+    private static final String MAIL_SUBJECT = "계좌 생성 되었습니다";
 
     public void mailLogging(MailSchedulerRequest request) {
-        mailLogRepository.save(new MailLog(request.userId(), request.email(), MailStatus.valueOf("PENDING"), request.content(), Instant.now(),Instant.now(), 0));
+        mailLogRepository.save(new MailLog(request.userId(), request.email(), MailStatus.PENDING, request.content(), Instant.now(),Instant.now(), 0));
     }
 
     @Async("customAsyncExecutor")
