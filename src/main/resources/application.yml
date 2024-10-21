@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USER_ID}
+    password: ${DB_PASSWORD}
+    url: jdbc:mysql://${DB_URL}/large-scale?socketTimeout=2000
+    hikari:
+      connection-timeout: 3000
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${USER_NAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+logging:
+  level:
+    root: INFO   # 기본 로그 레벨 설정 (DEBUG로 변경 가능)
