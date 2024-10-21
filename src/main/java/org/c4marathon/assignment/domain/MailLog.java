@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.c4marathon.assignment.controller.request.MailSchedulerRequest;
 import org.c4marathon.assignment.domain.model.MailStatus;
 
 import java.time.Instant;
@@ -68,14 +69,14 @@ public class MailLog {
         this.countRT = countRT;
     }
 
-    public MailLog(Integer userId, String email, MailStatus status, String content, Instant createTime, Instant updateTime, Integer countRT) {
-        this.userId = userId;
-        this.email = email;
-        this.status = status;
-        this.content = content;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-        this.countRT = countRT;
+    public MailLog(MailSchedulerRequest request) {
+        this.userId = request.userId();
+        this.email = request.email();
+        this.status = MailStatus.PENDING;
+        this.content = request.content();
+        this.createTime = Instant.now();
+        this.updateTime = Instant.now();
+        this.countRT = 0;
     }
 
 }

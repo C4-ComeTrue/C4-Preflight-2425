@@ -7,6 +7,7 @@ import org.c4marathon.assignment.controller.request.MailSchedulerRequest;
 import org.c4marathon.assignment.domain.MailLog;
 import org.c4marathon.assignment.domain.model.MailStatus;
 import org.c4marathon.assignment.repository.MailLogRepository;
+import org.c4marathon.assignment.repository.UserRepository;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -21,11 +22,15 @@ import java.util.List;
 @Slf4j
 public class MailSchedulerService {
     private final MailLogRepository mailLogRepository;
+    private final UserRepository userRepository;
     private final JavaMailSender javaMailSender;
     private static final String MAIL_SUBJECT = "계좌 생성 되었습니다";
 
     public void mailLogging(MailSchedulerRequest request) {
-        mailLogRepository.save(new MailLog(request.userId(), request.email(), MailStatus.PENDING, request.content(), Instant.now(),Instant.now(), 0));
+        if (!userRepository.existsById(request.userId())) {
+            throw new IllegalArgumentException("User ID " + request.userId() + " 이 존재하지 않습니다.");
+        }
+        mailLogRepository.save(new MailLog(request));
     }
 
     @Scheduled(cron = "0 * * * * *")
