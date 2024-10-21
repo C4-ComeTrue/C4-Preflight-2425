@@ -9,7 +9,6 @@ import org.c4marathon.assignment.domain.model.MailStatus;
 import org.c4marathon.assignment.repository.MailLogRepository;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,15 @@ public class MailSchedulerService {
         mailLogRepository.save(new MailLog(request.userId(), request.email(), MailStatus.PENDING, request.content(), Instant.now(),Instant.now(), 0));
     }
 
-    @Async("customAsyncExecutor")
+    @Scheduled(cron = "0 * * * * *")
+    protected void mailSendScheduler() {
+        List<MailLog> mailLogs = mailLogRepository.findMailLogsByStatusIn(List.of(MailStatus.PENDING, MailStatus.FAIL));
+
+        for (MailLog mailLog : mailLogs) {
+            handleMailSending(mailLog);
+        }
+    }
+
     protected void handleMailSending(MailLog mailLog){
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MailLog changedMailLog;
@@ -51,14 +58,5 @@ public class MailSchedulerService {
         }
 
         mailLogRepository.save(changedMailLog);
-    }
-
-    @Scheduled(cron = "0 * * * * *")
-    protected void mailSendScheduler() {
-        List<MailLog> mailLogs = mailLogRepository.findMailLogsByStatusIn(List.of(MailStatus.PENDING, MailStatus.FAIL));
-
-        for (MailLog mailLog : mailLogs) {
-            handleMailSending(mailLog);
-        }
     }
 }
