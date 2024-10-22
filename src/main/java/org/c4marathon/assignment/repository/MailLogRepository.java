@@ -2,7 +2,7 @@ package org.c4marathon.assignment.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.c4marathon.assignment.domain.MailLog;
-import org.c4marathon.assignment.domain.model.MailStatus;
+import org.c4marathon.assignment.model.type.MailStatus;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 

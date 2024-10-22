@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.c4marathon.assignment.controller.request.MailSchedulerRequest;
-import org.c4marathon.assignment.domain.model.MailStatus;
+import org.c4marathon.assignment.model.type.MailStatus;
 
 import java.time.Instant;
 

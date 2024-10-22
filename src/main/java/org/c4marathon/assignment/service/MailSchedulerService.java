@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.c4marathon.assignment.controller.request.MailSchedulerRequest;
 import org.c4marathon.assignment.domain.MailLog;
-import org.c4marathon.assignment.domain.model.MailStatus;
+import org.c4marathon.assignment.model.type.MailStatus;
 import org.c4marathon.assignment.repository.MailLogRepository;
 import org.c4marathon.assignment.repository.UserRepository;
 import org.springframework.mail.javamail.JavaMailSender;
