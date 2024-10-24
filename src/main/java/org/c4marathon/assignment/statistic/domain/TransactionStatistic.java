@@ -1,6 +1,6 @@
 package org.c4marathon.assignment.statistic.domain;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +19,7 @@ public class TransactionStatistic {
 	private Long id;
 
 	@Column(columnDefinition = "datetime(6)")
-	private LocalDateTime statisticDate;
+	private Instant statisticDate;
 
 	@Column(nullable = false)
 	private long dailyTotalAmount;
