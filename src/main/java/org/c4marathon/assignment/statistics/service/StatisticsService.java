@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.*;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -48,9 +49,13 @@ public class StatisticsService {
 
         //transactionList 에서 데이터가 1/1, 1/2 같이들어올 경우
         // 여기서 맵으로 만들때 1/2일이 먼저 들어갈 수 있다...?
-        // 그래서 누적할 때 꼬인다 이거 한 번 체크해보기
+        // 그래서 누적할 때 꼬인다 이거 한 번 체크해보기 -> TreeMap 로 날짜로 정렬
         Map<LocalDate, List<Transaction>> map = transactionList.stream()
-                .collect(Collectors.groupingBy(transaction -> LocalDate.ofInstant(transaction.getTransactionDate(), zoneId)));
+                .collect(Collectors.groupingBy(
+                        transaction -> LocalDate.ofInstant(transaction.getTransactionDate(), zoneId),
+                        TreeMap::new,
+                        Collectors.toList()
+                ));
 
 
         for (Map.Entry<LocalDate, List<Transaction>> entry : map.entrySet()) {
