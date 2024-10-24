@@ -13,6 +13,11 @@ import java.util.List;
 public interface TransactionJpaRepository extends JpaRepository<Transaction, Long> {
 
     @Query("""
+    SELECT MIN(t.transactionDate) FROM Transaction t
+    """)
+    Instant findEarliestTransactionDate();
+
+    @Query("""
 
             SELECT t
     FROM Transaction t

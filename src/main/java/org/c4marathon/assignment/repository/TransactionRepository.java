@@ -12,6 +12,11 @@ import java.util.List;
 public class TransactionRepository {
 	private final TransactionJpaRepository transactionJpaRepository;
 
+
+	public Instant findEarliestTransactionDate() {
+		return transactionJpaRepository.findEarliestTransactionDate();
+	}
+
 	/**
 	 *  주어진 lastDate를 활용하여, size 만큼의 Transaction 정보를 가져온다.
 	 *  @param lastDate
