@@ -1,15 +1,24 @@
 package org.c4marathon.assignment.controller.response;
 
+import org.c4marathon.assignment.domain.CumulativeAmount;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 public record CumulativeAmountResponse(
         @DateTimeFormat(pattern = "yyyy-MM-dd")
-        Instant startDate,
+        LocalDate startDate,
         @DateTimeFormat(pattern = "yyyy-MM-dd")
-        Instant endDate,
-        int dailyAmount,
+        LocalDate endDate,
+        long dailyAmount,
         long cumulativeAmount
 ) {
+        public CumulativeAmountResponse(CumulativeAmount cumulativeAmount) {
+                this(
+                        cumulativeAmount.getDate(),
+                        cumulativeAmount.getDate(),
+                        cumulativeAmount.getDailyAmount(),
+                        cumulativeAmount.getCumulativeAmount()
+                );
+        }
 }
