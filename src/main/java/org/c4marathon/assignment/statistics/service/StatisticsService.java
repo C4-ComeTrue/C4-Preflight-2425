@@ -35,9 +35,7 @@ public class StatisticsService {
                         lastTransaction == null ? null : lastTransaction.getTransactionDate(),
                         lastTransaction == null ? 0 : lastTransaction.getId(),
                         1000),
-                transactionList -> {
-                    latestCumulativeRemittance.set(processTransactionBatch(transactionList, latestCumulativeRemittance.get()));
-                }
+                transactionList -> latestCumulativeRemittance.set(processTransactionBatch(transactionList, latestCumulativeRemittance.get()))
         );
     }
 
