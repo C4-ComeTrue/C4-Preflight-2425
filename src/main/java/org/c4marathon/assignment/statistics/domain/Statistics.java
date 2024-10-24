@@ -46,4 +46,12 @@ public class Statistics {
                 .build();
     }
 
+    public void update(LocalDate statisticsDate, Long totalRemittance, Long cumulativeRemittance, LocalDateTime createAt) {
+        this.statisticsDate = statisticsDate;
+        this.totalRemittance += totalRemittance;
+        this.cumulativeRemittance = cumulativeRemittance;
+        this.createAt = createAt;
+    }
+
+
 }
