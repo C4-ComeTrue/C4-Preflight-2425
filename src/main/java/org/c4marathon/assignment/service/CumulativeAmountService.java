@@ -2,7 +2,6 @@ package org.c4marathon.assignment.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.c4marathon.assignment.controller.request.RangeDateRequest;
 import org.c4marathon.assignment.controller.response.CumulativeAmountResponse;
 import org.c4marathon.assignment.domain.CumulativeAmount;
 import org.c4marathon.assignment.domain.Transaction;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -127,9 +127,44 @@ public class CumulativeAmountService {
         cumulativeRepository.save(cumulativeAmount);
     }
 
-    public List<CumulativeAmountResponse> getCumulativeAmountRangeDate(RangeDateRequest request){
-        CumulativeAmountResponse c= new CumulativeAmountResponse(LocalDate.now(),LocalDate.now(),1,1);
-        return List.of(c);
+    public List<CumulativeAmountResponse> getCumulativeAmountRangeDate(LocalDate startDate, LocalDate endDate){
+        List<CumulativeAmountResponse> cumulativeAmountResponses = new ArrayList<>();
+
+        // 첫날의 CumulativeAmount를 가져옴 (첫날 데이터는 무조건 있다고 전제)
+        CumulativeAmount previousCumulativeAmount = cumulativeRepository.findByDate(startDate);
+        long previousCumulativeTotal = previousCumulativeAmount.getDailyAmount();
+
+        // 첫날의 누적합을 결과 리스트에 추가
+        cumulativeAmountResponses.add(new CumulativeAmountResponse(
+                startDate,
+                startDate,
+                previousCumulativeAmount.getDailyAmount(),
+                previousCumulativeTotal));
+
+        // startDate 다음 날부터 endDate까지 반복하면서 누적합을 계산
+        for (LocalDate currentDate = startDate.plusDays(1); !currentDate.isAfter(endDate); currentDate = currentDate.plusDays(1)) {
+            // 현재 날짜의 CumulativeAmount를 가져옴 (dailyAmount는 항상 존재한다고 가정)
+            CumulativeAmount currentCumulativeAmount = cumulativeRepository.findByDate(currentDate);
+            long dailyAmount = currentCumulativeAmount.getDailyAmount();
+
+            // 전날 누적합 + 오늘의 dailyAmount를 오늘의 누적합으로 설정
+            long currentCumulativeTotal = previousCumulativeTotal + dailyAmount;
+
+            // 오늘의 데이터를 리스트에 추가
+            cumulativeAmountResponses.add(new CumulativeAmountResponse(
+                    currentDate,
+                    currentDate,
+                    dailyAmount,
+                    currentCumulativeTotal));
+
+            // 다음 날을 위한 누적합 업데이트
+            previousCumulativeTotal = currentCumulativeTotal;
+        }
+
+        // 결과 리스트 반환
+        return cumulativeAmountResponses;
     }
+
+
 
 }
