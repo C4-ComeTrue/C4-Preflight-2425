@@ -12,7 +12,6 @@ import java.util.List;
 public class TransactionRepository {
 	private final TransactionJpaRepository transactionJpaRepository;
 
-
 	public Instant findEarliestTransactionDate() {
 		return transactionJpaRepository.findEarliestTransactionDate();
 	}
