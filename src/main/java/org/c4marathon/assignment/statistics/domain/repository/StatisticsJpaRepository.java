@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface StatisticsJpaRepository extends JpaRepository<Statistics, Long> {
 
+    // index(statisticsDate)
     @Query("""
     SELECT s.cumulativeRemittance
     FROM Statistics s
@@ -18,6 +19,7 @@ public interface StatisticsJpaRepository extends JpaRepository<Statistics, Long>
     """)
     Long getLatestCumulativeRemittance();
 
+    // index(statisticsDate)
     @Query("""
     SELECT s
     FROM Statistics s

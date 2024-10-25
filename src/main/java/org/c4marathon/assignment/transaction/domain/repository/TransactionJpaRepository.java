@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface TransactionJpaRepository extends JpaRepository<Transaction, Integer> {
 
+    // index(transactionDate)
     @Query("""
     SELECT t
     FROM Transaction t

@@ -27,15 +27,17 @@ public class StatisticsService {
     private final TransactionRepository transactionRepository;
     private final StatisticsRepository statisticsRepository;
 
-    /*
-    * 새벽 4시에 그 전날 통계를 내는 작업
-    * 새벽 4시에 그 전날 date를 가져와서 실행
-    * */
+    /**
+     * 새벽 4시 전날 통계를 집계
+     */
     @Scheduled(cron = "0 0 4 * * ?")
     public void scheduleStatistics() {
         calculateScheduleStatistics();
     }
 
+    /**
+     * 현재 시간 기준 전날의 통계를 집계
+     */
     public void calculateScheduleStatistics() {
         LocalDate date = LocalDate.now().minusDays(1L);
 
@@ -51,6 +53,12 @@ public class StatisticsService {
         );
     }
 
+    /**
+     * 조회한 Transaction 데이터들의 일 단위 송금금액, 누적 금액을 계산
+     * @param transactionList
+     * @param date
+     * @param latestCumulativeRemittance
+     */
     public void calculateTotalRemittance(List<Transaction> transactionList, LocalDate date, Long latestCumulativeRemittance) {
 
         long totalRemittance = transactionList.stream()
@@ -62,6 +70,11 @@ public class StatisticsService {
         saveOrUpdateStatistics(date, totalRemittance, latestCumulativeRemittance);
     }
 
+    /**
+     * Cursor 페이징 기반으로 Transaction 데이터를 1000개씩 pageSize 만큼 조회
+     * @param pageSize
+     * @param endDate
+     */
     public void calculateStatistics(int pageSize, LocalDate endDate) {
 
         AtomicLong latestCumulativeRemittance = new AtomicLong(statisticsRepository.getLatestCumulativeRemittance());
@@ -77,7 +90,7 @@ public class StatisticsService {
     }
 
     /**
-     * 시작날짜와 종료날짜를 입력받아 통계 데이터를 조회하는 로직
+     * 시작날짜와 종료날짜를 입력받아 통계 데이터를 조회
      * @param startDate
      * @param endDate
      * @return
@@ -90,10 +103,13 @@ public class StatisticsService {
                 .toList();
     }
 
-    /*
-     * 넘어온 거래 데이터를 날짜별로 그룹화해서 계산해서 통계 테이블에 저장
-     * 만약 그 날짜에 해당하는 통계 데이터가 있으면 거기다가 누적해서 저장
-     * */
+
+    /**
+     * 조회한 Transaction 데이터들을 날짜 별로 그룹화 하여 일 단위 송금금액, 누적 송금금액을 계산
+     * @param transactionList
+     * @param latestCumulativeRemittance
+     * @return
+     */
     private Long processTransactionBatch(List<Transaction> transactionList, Long latestCumulativeRemittance) {
         ZoneId zoneId = ZoneId.of("UTC");
 
@@ -106,7 +122,6 @@ public class StatisticsService {
                         TreeMap::new,
                         Collectors.toList()
                 ));
-
 
         for (Map.Entry<LocalDate, List<Transaction>> entry : map.entrySet()) {
             LocalDate transactionDate = entry.getKey();
@@ -123,6 +138,12 @@ public class StatisticsService {
         return latestCumulativeRemittance;
     }
 
+    /**
+     * 계산한 일 단위 송금금액과 누적 송금금액을 통계 데이터에 저장
+     * @param transactionDate
+     * @param totalRemittance
+     * @param latestCumulativeRemittance
+     */
     private void saveOrUpdateStatistics(LocalDate transactionDate, Long totalRemittance, Long latestCumulativeRemittance) {
 
         Statistics statistics = statisticsRepository.findByStatisticsDate(transactionDate);
