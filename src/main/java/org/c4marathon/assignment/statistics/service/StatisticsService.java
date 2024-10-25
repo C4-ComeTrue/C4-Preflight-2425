@@ -7,6 +7,7 @@ import org.c4marathon.assignment.statistics.domain.repository.StatisticsReposito
 import org.c4marathon.assignment.transaction.domain.Transaction;
 import org.c4marathon.assignment.transaction.domain.repository.TransactionRepository;
 import org.c4marathon.assignment.util.QueryExecuteTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -24,6 +25,41 @@ public class StatisticsService {
 
     private final TransactionRepository transactionRepository;
     private final StatisticsRepository statisticsRepository;
+
+    /*
+    * 새벽 4시에 그 전날 통계를 내는 작업
+    * 새벽 4시에 그 전날 date를 가져와서 실행
+    * */
+    @Scheduled(cron = "0 0 4 * * ?")
+    public void scheduleStatistics() {
+        calculateScheduleStatistics();
+    }
+
+    public void calculateScheduleStatistics() {
+        LocalDate date = LocalDate.now().minusDays(1L);
+
+        Long latestCumulativeRemittance = statisticsRepository.getLatestCumulativeRemittance();
+
+        QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursorAndPageLimit(-1, 1000,
+                lastTransaction -> transactionRepository.findTransactionByDate(
+                        date,
+                        lastTransaction == null ? null : lastTransaction.getTransactionDate(),
+                        lastTransaction == null ? 0 : lastTransaction.getId(),
+                        1000),
+                transactionList -> calculateTotalRemittance(transactionList, date, latestCumulativeRemittance)
+        );
+    }
+
+    public void calculateTotalRemittance(List<Transaction> transactionList, LocalDate date, Long latestCumulativeRemittance) {
+
+        long totalRemittance = transactionList.stream()
+                .mapToLong(Transaction::getAmount)
+                .sum();
+
+        latestCumulativeRemittance += totalRemittance;
+
+        saveOrUpdateStatistics(date, totalRemittance, latestCumulativeRemittance);
+    }
 
 
     public void calculateStatistics(int pageSize, LocalDate endDate) {

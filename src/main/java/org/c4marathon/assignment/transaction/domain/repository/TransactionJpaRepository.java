@@ -34,4 +34,15 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Int
             @Param("lastId") Integer lastId,
             @Param("size") int size
     );
+
+    @Query("""
+    SELECT t
+    FROM Transaction t
+    WHERE DATE(t.transactionDate) = :date
+    ORDER BY t.transactionDate ASC, t.id ASC
+    LIMIT :size
+    """)
+    List<Transaction> findTransactionByDate(@Param("date") LocalDate date, @Param("size") int size);
+
+
 }

@@ -19,4 +19,11 @@ public class TransactionRepository {
         }
         return transactionJpaRepository.findTransactionWithEndDateAndLastDate(endDate, lastDate, lastId, size);
     }
+
+    public List<Transaction> findTransactionByDate(LocalDate endDate, Instant lastDate, int lastId, int size) {
+        if (lastDate == null) {
+            return transactionJpaRepository.findTransactionByDate(endDate, size);
+        }
+        return transactionJpaRepository.findTransactionWithEndDateAndLastDate(endDate, lastDate, lastId, size);
+    }
 }
