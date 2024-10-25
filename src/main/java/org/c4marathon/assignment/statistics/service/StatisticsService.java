@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.c4marathon.assignment.statistics.domain.Statistics;
 import org.c4marathon.assignment.statistics.domain.repository.StatisticsRepository;
+import org.c4marathon.assignment.statistics.dto.StatisticsResponse;
 import org.c4marathon.assignment.transaction.domain.Transaction;
 import org.c4marathon.assignment.transaction.domain.repository.TransactionRepository;
 import org.c4marathon.assignment.util.QueryExecuteTemplate;
@@ -61,7 +62,6 @@ public class StatisticsService {
         saveOrUpdateStatistics(date, totalRemittance, latestCumulativeRemittance);
     }
 
-
     public void calculateStatistics(int pageSize, LocalDate endDate) {
 
         AtomicLong latestCumulativeRemittance = new AtomicLong(statisticsRepository.getLatestCumulativeRemittance());
@@ -74,6 +74,20 @@ public class StatisticsService {
                         1000),
                 transactionList -> latestCumulativeRemittance.set(processTransactionBatch(transactionList, latestCumulativeRemittance.get()))
         );
+    }
+
+    /**
+     * 시작날짜와 종료날짜를 입력받아 통계 데이터를 조회하는 로직
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public List<StatisticsResponse> getStatisticsByStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
+        List<Statistics> statisticsByDate = statisticsRepository.findByStatisticsByStartDateAndEndDate(startDate, endDate);
+
+        return statisticsByDate.stream()
+                .map(StatisticsResponse::new)
+                .toList();
     }
 
     /*
@@ -131,4 +145,5 @@ public class StatisticsService {
         statisticsRepository.save(statistics);
 
     }
+
 }

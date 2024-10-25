@@ -5,6 +5,7 @@ import org.c4marathon.assignment.statistics.domain.Statistics;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,6 +23,10 @@ public class StatisticsRepository {
 
     public void save(Statistics statistics) {
         statisticsJpaRepository.save(statistics);
+    }
+
+    public List<Statistics> findByStatisticsByStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
+        return statisticsJpaRepository.findByStatisticsByStartDateAndEndDate(startDate, endDate);
     }
 }
 

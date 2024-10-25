@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface StatisticsJpaRepository extends JpaRepository<Statistics, Long> {
 
@@ -23,4 +24,13 @@ public interface StatisticsJpaRepository extends JpaRepository<Statistics, Long>
     WHERE s.statisticsDate = :transactionDate
     """)
     Statistics findByStatisticsDate(@Param("transactionDate") LocalDate transactionDate);
+
+    // index(statisticsDate)
+    @Query("""
+    SELECT s
+    FROM Statistics s
+    WHERE s.statisticsDate BETWEEN :startDate AND :endDate
+    """)
+    List<Statistics> findByStatisticsByStartDateAndEndDate(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
 }
