@@ -23,28 +23,12 @@ public class TransactionRepository {
 	 *  @param size
 	 *  @return
 	 */
-	public List<Transaction> findTransaction(Instant endDate, Instant lastDate, Integer lastDateId, int size){
-		if(lastDateId == null){
-			return transactionJpaRepository.findTransaction(size);
-		}
-
-		return transactionJpaRepository.findTransactionWithEndDateAndLastDate(endDate, lastDate, lastDateId, size);
-	}
-
-	/**
-	 *  주어진 lastDate를 활용하여, size 만큼의 Transaction 정보를 가져온다.
-	 *  @param lastDate
-	 *  @param size
-	 *  @return
-	 */
 	public List<Transaction> findOneDayTransaction(Instant startDate, Instant endDate, Instant lastDate, Integer lastDateId, int size){
 
 		if(lastDateId == null){
 			return transactionJpaRepository.findTransactionWithEndDate(startDate, endDate, size);
 		}
-
 		return transactionJpaRepository.findOneDayTransactionWithEndDateAndLastDate(startDate, endDate, lastDate, lastDateId, size);
-
 	}
 
 }

@@ -18,26 +18,6 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
     Instant findEarliestTransactionDate();
 
     @Query("""
-
-            SELECT t
-    FROM Transaction t
-    ORDER BY t.transactionDate , t.id
-    LIMIT :size
-    """)
-    List<Transaction> findTransaction(@Param("size") int size);
-
-    @Query("""
-    SELECT t
-    FROM Transaction t
-    WHERE t.transactionDate < :endDate
-              AND (t.transactionDate > :lastDate)
-              OR (t.transactionDate = :lastDate AND t.id > :lastDateId)
-    ORDER BY t.transactionDate, t.id 
-    LIMIT :size
-    """)
-    List<Transaction> findTransactionWithEndDateAndLastDate(@Param("endDate") Instant endDate, @Param("lastDate") Instant lastDate, @Param("lastDateId") int lastDateId, @Param("size") int size);
-
-    @Query("""
     SELECT t
     FROM Transaction t
     WHERE (t.transactionDate >= :startDate) AND (t.transactionDate < :endDate)
@@ -56,6 +36,5 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
     LIMIT :size
     """)
     List<Transaction> findOneDayTransactionWithEndDateAndLastDate(@Param("startDate") Instant startDate, @Param("endDate") Instant endDate, @Param("lastDate") Instant lastDate, @Param("lastDateId") int lastDateId, @Param("size") int size);
-
 
 }
