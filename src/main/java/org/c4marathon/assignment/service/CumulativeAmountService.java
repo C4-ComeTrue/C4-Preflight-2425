@@ -9,14 +9,17 @@ import org.c4marathon.assignment.repository.CumulativeRepository;
 import org.c4marathon.assignment.repository.TransactionRepository;
 import org.c4marathon.assignment.util.C4QueryExecuteTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,6 +140,7 @@ public class CumulativeAmountService {
 
     /**
      * API : statics/cumulative
+     * Scheduler : 하루치에 대한 dailyAmount 계산시에도 사용
      * > getCumulativeAmountDate > dailyAmountByDate
      * [1000개 단위로 묶인 데이터로 작업] 당일 Amount만 계산하는  로직
      * */
@@ -157,6 +161,7 @@ public class CumulativeAmountService {
 
     /**
      * API : statics/cumulative
+     * Scheduler : 하루치에 대한 dailyAmount 계산시에도 사용
      * > getCumulativeAmountDate > dailyAmountByDate > updateCumulativeAmountByDate
      * [1000개 단위로 묶인 데이터로 작업] 데이터들을 update - save 하는 함수
      * */
@@ -174,4 +179,56 @@ public class CumulativeAmountService {
 
         cumulativeRepository.save(cumulativeAmount);
     }
+
+
+    /**
+     * 스케쥴러 동작 확인용 - 추후 삭제 예정  && cumulativeScheduler clock 삭제하기
+     * */
+    private Clock clock;
+
+    public void setClock(Clock fixedClock) {
+        this.clock = fixedClock;
+    }
+
+    /**
+     * Scheduler : 새벽 4시 마다, 전날의 통계 집계가 진행된다.
+     * */
+    @Scheduled(cron = "0 0 4 * * *")
+    public void cumulativeScheduler() {
+        // 어제 날짜 계산
+        LocalDate yesterday = LocalDate.now(clock).minusDays(1);
+        Instant startDate = yesterday.atStartOfDay(ZoneOffset.UTC).toInstant();// 2023-01-04-00:00
+        Instant endDate = yesterday.atStartOfDay(ZoneOffset.UTC).plusDays(1).toInstant(); // 2023-01-05-00:00
+
+        //어제 날짜만의 daily 누적합 구하기 = yesterDayDailAmount
+        AtomicLong dailAmount = new AtomicLong();
+        C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursorAndPageLimit(
+                -1, 1000,
+                lastTransaction -> transactionRepository.findOneDayTransaction(
+                        startDate,
+                        endDate,
+                        lastTransaction == null ? null : lastTransaction.getTransactionDate(),
+                        lastTransaction == null ? null : lastTransaction.getId(),
+                        1000
+                ),
+                transactionList -> {
+                    // 트랜잭션 리스트에서 amount 합산하여 dailyAmount 누적
+                    dailAmount.addAndGet(transactionList.stream()
+                            .mapToLong(Transaction::getAmount)
+                            .sum());
+                }
+        );
+
+        LocalDate twoDaysAgo = yesterday.minusDays(1); //3일
+        CumulativeAmount twoDaysAgoCumulativeAmount = cumulativeRepository.findByDate(twoDaysAgo); //3일꺼
+
+        long twoDaysAgoCumulativeAmountNum = (twoDaysAgoCumulativeAmount != null) ? twoDaysAgoCumulativeAmount.getCumulativeAmount() : 0L;
+        long cumulativeAmount = twoDaysAgoCumulativeAmountNum + dailAmount.get();
+
+        //이거 추가된거
+        CumulativeAmount cumulativeAmount1 = new CumulativeAmount(startDate.atZone(ZoneOffset.UTC).toLocalDate(), dailAmount.get(), cumulativeAmount);
+        cumulativeRepository.save(cumulativeAmount1);
+
+    }
+
 }
