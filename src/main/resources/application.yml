@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USER_ID}
     password: ${DB_PASSWORD}
-    url: jdbc:mysql://${DB_URL}/large-scale?socketTimeout=5000&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://${DB_URL}/large-scale?socketTimeout=10000&useSSL=false&serverTimezone=UTC
 
     hikari:
       connection-timeout: 10000
