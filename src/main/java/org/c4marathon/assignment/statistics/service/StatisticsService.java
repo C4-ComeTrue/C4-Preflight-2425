@@ -10,6 +10,7 @@ import org.c4marathon.assignment.transaction.domain.repository.TransactionReposi
 import org.c4marathon.assignment.util.QueryExecuteTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.util.List;
@@ -31,6 +32,7 @@ public class StatisticsService {
      * 새벽 4시 전날 통계를 집계
      */
     @Scheduled(cron = "0 0 4 * * ?")
+    @Transactional
     public void scheduleStatistics() {
         calculateScheduleStatistics();
     }
@@ -75,6 +77,7 @@ public class StatisticsService {
      * @param pageSize
      * @param endDate
      */
+    @Transactional
     public void calculateStatistics(int pageSize, LocalDate endDate) {
 
         AtomicLong latestCumulativeRemittance = new AtomicLong(statisticsRepository.getLatestCumulativeRemittance());
@@ -95,6 +98,7 @@ public class StatisticsService {
      * @param endDate
      * @return
      */
+    @Transactional(readOnly = true)
     public List<StatisticsResponse> getStatisticsByStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
         List<Statistics> statisticsByDate = statisticsRepository.findByStatisticsByStartDateAndEndDate(startDate, endDate);
 
