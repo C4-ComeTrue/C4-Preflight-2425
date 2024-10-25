@@ -52,7 +52,7 @@ public class CumulativeAmountService {
         List<CumulativeAmountResponse> responses = new ArrayList<>();
 
         //1. 만약 시작날짜의 값이 없다면 - (statics/cumulative가 JAVA heap 메모리 용량이 적어서 OOM 발생으로 인해 값을 다 못채움)
-        CumulativeAmount CA = cumulativeRepository.findByDate(startDate);
+        CumulativeAmount CA = cumulativeRepository.findByDate(endDate);
         if(CA == null) {
             //2. endDate까지 값을 다 채워 넣는다.
             calTransationAmount(endDate);
