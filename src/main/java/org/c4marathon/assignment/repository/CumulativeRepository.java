@@ -1,6 +1,7 @@
 package org.c4marathon.assignment.repository;
 
 import lombok.RequiredArgsConstructor;
+
 import org.c4marathon.assignment.domain.CumulativeAmount;
 import org.springframework.stereotype.Repository;
 
@@ -11,13 +12,13 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class CumulativeRepository {
-    private final CumulativeJpaRepository cumulativeJpaRepository;
+	private final CumulativeJpaRepository cumulativeJpaRepository;
 
-    public CumulativeAmount findByDate(LocalDate date){
-        return cumulativeJpaRepository.findByDate(date);
-    }
+	public CumulativeAmount findByDate(LocalDate date) {
+		return cumulativeJpaRepository.findByDate(date);
+	}
 
-    public void save(CumulativeAmount cumulativeAmount){
-        cumulativeJpaRepository.save(cumulativeAmount);
-    }
+	public void save(CumulativeAmount cumulativeAmount) {
+		cumulativeJpaRepository.save(cumulativeAmount);
+	}
 }

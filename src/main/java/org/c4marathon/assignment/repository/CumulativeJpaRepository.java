@@ -13,6 +13,6 @@ import java.util.Optional;
 @Repository
 public interface CumulativeJpaRepository extends JpaRepository<CumulativeAmount, Integer> {
 
-    @Query("SELECT c FROM CumulativeAmount c WHERE c.date = :date")
-    CumulativeAmount findByDate(@Param("date") LocalDate date);
+	@Query("SELECT c FROM CumulativeAmount c WHERE c.date = :date")
+	CumulativeAmount findByDate(@Param("date") LocalDate date);
 }

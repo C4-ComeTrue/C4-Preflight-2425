@@ -6,13 +6,13 @@ import java.util.function.Function;
 import org.apache.commons.lang3.tuple.Pair;
 import org.c4marathon.assignment.util.C4PageTokenUtil;
 
-
 public record PageInfo<T>(
 	String pageToken, //커서 정보 (다음 호출 시 사용)
 	List<T> data, // 데이터 목록
 	boolean hasNext //다음 페이지 존재 여부
 ) {
-	public static <T> PageInfo<T> of(List<T> data, int expectedSize, Function<T, Object> firstPageTokenFunction, Function<T, Object> secondPageTokenFunction) {
+	public static <T> PageInfo<T> of(List<T> data, int expectedSize, Function<T, Object> firstPageTokenFunction,
+		Function<T, Object> secondPageTokenFunction) {
 		if (data.size() <= expectedSize) {
 			return new PageInfo<>(null, data, false);
 		}

@@ -2,6 +2,7 @@ package org.c4marathon.assignment.controller;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+
 import org.c4marathon.assignment.controller.response.CumulativeAmountResponse;
 import org.c4marathon.assignment.service.CumulativeAmountService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,22 +20,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatisticsController {
 
-    private final CumulativeAmountService cumulativeAmountService;
+	private final CumulativeAmountService cumulativeAmountService;
 
-    /**
-     * 1. 특정 날짜의 통계를 강제로 집계 하는 API
-     *
-     */
-    @GetMapping("/cumulative")
-    public ResponseEntity<CumulativeAmountResponse> getCumulativeAmountDate(@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        return ResponseEntity.ok(cumulativeAmountService.getCumulativeAmountDate(date));
-    }
+	/**
+	 * 1. 특정 날짜의 통계를 강제로 집계 하는 API
+	 *
+	 */
+	@GetMapping("/cumulative")
+	public ResponseEntity<CumulativeAmountResponse> getCumulativeAmountDate(
+		@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+		return ResponseEntity.ok(cumulativeAmountService.getCumulativeAmountDate(date));
+	}
 
-    /**
-     * 2. 주어진 날짜 사이의 통계값을 조회 하는 API
-     */
-    @GetMapping("/cumulative/range")
-    public ResponseEntity<List<CumulativeAmountResponse>> getCumulativeAmountRangeDate(@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        return ResponseEntity.ok(cumulativeAmountService.getCumulativeAmountRangeDate(startDate, endDate));
-    }
+	/**
+	 * 2. 주어진 날짜 사이의 통계값을 조회 하는 API
+	 */
+	@GetMapping("/cumulative/range")
+	public ResponseEntity<List<CumulativeAmountResponse>> getCumulativeAmountRangeDate(
+		@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+		@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+		return ResponseEntity.ok(cumulativeAmountService.getCumulativeAmountRangeDate(startDate, endDate));
+	}
 }

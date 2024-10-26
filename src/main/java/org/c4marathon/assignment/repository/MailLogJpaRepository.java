@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface MailLogJpaRepository extends JpaRepository<MailLog, Integer> {
 
-    List<MailLog> findMailLogsByStatusIn(List<MailStatus> statuses);
+	List<MailLog> findMailLogsByStatusIn(List<MailStatus> statuses);
 }

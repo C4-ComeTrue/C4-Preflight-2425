@@ -2,6 +2,7 @@ package org.c4marathon.assignment.repository;
 
 import org.c4marathon.assignment.domain.Transaction;
 import org.springframework.stereotype.Repository;
+
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
@@ -22,12 +23,14 @@ public class TransactionRepository {
 	 *  @param size
 	 *  @return
 	 */
-	public List<Transaction> findOneDayTransaction(Instant startDate, Instant endDate, Instant lastDate, Integer lastDateId, int size){
+	public List<Transaction> findOneDayTransaction(Instant startDate, Instant endDate, Instant lastDate,
+		Integer lastDateId, int size) {
 
-		if(lastDateId == null){
+		if (lastDateId == null) {
 			return transactionJpaRepository.findTransactionWithEndDate(startDate, endDate, size);
 		}
-		return transactionJpaRepository.findOneDayTransactionWithEndDateAndLastDate(startDate, endDate, lastDate, lastDateId, size);
+		return transactionJpaRepository.findOneDayTransactionWithEndDateAndLastDate(startDate, endDate, lastDate,
+			lastDateId, size);
 	}
 
 }
