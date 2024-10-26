@@ -1,19 +1,14 @@
 package org.c4marathon.assignment.statistic.application;
 
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.c4marathon.assignment.global.util.CustomThreadPoolExecutor;
 import org.c4marathon.assignment.global.util.QueryTemplate;
 import org.c4marathon.assignment.statistic.domain.TransactionStatistic;
 import org.c4marathon.assignment.statistic.domain.TransactionStatisticRepository;
@@ -28,17 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class TransactionStatisticService {
-	private static final long DAY_TIME_SECONDS = 24L * 60L * 60L;
 	private static final long SPLIT_SECONDS_PER_THREADS = 6L * 60L * 60L; // 스레드 별 시간 단위
 	private static final int BATCH_SIZE = 1000;
 
-	private final TransactionStatisticRepository statisticRepository;
+	private final CustomThreadPoolExecutor executorService;
 	private final TransactionRepository transactionRepository;
 	private final TransactionStatisticRepository transactionStatisticRepository;
 
-	public TransactionStatisticService(TransactionStatisticRepository statisticRepository,
+	public TransactionStatisticService(CustomThreadPoolExecutor executorService,
 		TransactionRepository transactionRepository, TransactionStatisticRepository transactionStatisticRepository) {
-		this.statisticRepository = statisticRepository;
+		this.executorService = executorService;
 		this.transactionRepository = transactionRepository;
 		this.transactionStatisticRepository = transactionStatisticRepository;
 	}
@@ -55,64 +49,48 @@ public class TransactionStatisticService {
 	 * @return
 	 */
 	public TransactionStatisticResult aggregate(Instant theDay) {
-		log.info("theDay: {}", theDay);
-		Optional<TransactionStatistic> statisticOptional = statisticRepository.findCloseStatisticByStatisticDate(theDay);
-
-		if (statisticOptional.isPresent() && Objects.equals(statisticOptional.get().getStatisticDate(), theDay)) {
-			return TransactionStatisticResult.from(statisticOptional.get());
-		}
+		AtomicLong dailyAmount = new AtomicLong(0L);
+		AtomicLong cumulativeAmount = new AtomicLong(0L);
 
 		Instant endDay = getMidnightOfDay(theDay).plus(1L, ChronoUnit.DAYS);
-		long cumulativeAmount = 0L;
-		Instant startDay;
 
-		if (statisticOptional.isPresent()) {
-			TransactionStatistic transactionStatistic = statisticOptional.get();
-			startDay = transactionStatistic.getStatisticDate().plus(1L, ChronoUnit.DAYS);
-			cumulativeAmount = transactionStatistic.getCumulativeAmount();
-		} else {
-			Transaction firstTransaction = transactionRepository.findFirstOrderByTransactionDate().orElse(null);
-			startDay = firstTransaction == null ? Instant.now() : getMidnightOfDay(firstTransaction.getTransactionDate());
-		}
+		Instant startDate = Instant.EPOCH.plus(30L * 365L, ChronoUnit.DAYS);
+		List<Instant> splitTimes = getSplitTimes(startDate, endDay);
 
-		List<Instant> splitTimes = getSplitTimes(startDay, endDay);
+		executorService.init();
 
-		Map<Instant, AtomicLong> statisticMap = new TreeMap<>(Comparator.comparing(Instant::getEpochSecond));
-		splitTimes.forEach(splitTime -> statisticMap.putIfAbsent(getMidnightOfDay(splitTime), new AtomicLong()));
+		splitTimes.forEach(
+			splitTime -> executorService.execute(() -> QueryTemplate.<Transaction>selectAndExecuteWithCursor(BATCH_SIZE,
+					transaction -> transactionRepository.findBetweenTimesWithCursor(
+						transaction == null ? splitTime : transaction.getTransactionDate(),
+						splitTime.plusSeconds(SPLIT_SECONDS_PER_THREADS), transaction == null ? null : transaction.getId(),
+						BATCH_SIZE),
+					transactions -> transactions.forEach(
+						transaction -> addAmount(dailyAmount, cumulativeAmount, transaction, theDay)
+					)
+				)
+			));
 
-		ExecutorService executorService = Executors.newFixedThreadPool(8);
+		executorService.waitToEnd();
 
-		splitTimes.forEach(splitTime -> executorService.execute(() ->
-			QueryTemplate.<Transaction>selectAndExecuteWithCursor(BATCH_SIZE,
-				transaction -> transactionRepository.findBetweenTimesWithCursor(transaction == null ? splitTime : transaction.getTransactionDate(), splitTime.plusSeconds(SPLIT_SECONDS_PER_THREADS), transaction == null ? null : transaction.getId(), BATCH_SIZE),
-				transactions -> transactions.forEach(transaction -> calculateStatistic(transaction, statisticMap)))
-			)
-		);
+		TransactionStatistic statistic = TransactionStatistic.builder()
+			.statisticDate(getMidnightOfDay(theDay))
+			.dailyTotalAmount(dailyAmount.get())
+			.cumulativeAmount(cumulativeAmount.get())
+			.build();
 
-		executorService.shutdown();
-		try {
-			executorService.awaitTermination(20L, TimeUnit.MINUTES);
-		} catch (Exception e) {
-			log.warn("스레드 풀이 정상적으로 종료되지 않았습니다.");
-		}
+		transactionStatisticRepository.save(statistic);
 
-		List<TransactionStatistic> statistics = getStatistics(statisticMap, cumulativeAmount);
-
-		transactionStatisticRepository.saveAll(statistics);
-
-		return TransactionStatisticResult.from(statistics.get(statistics.size() - 1));
+		return TransactionStatisticResult.from(statistic);
 	}
 
-	private void calculateStatistic(Transaction transaction, Map<Instant, AtomicLong> statisticMap) {
-		Instant curTransactionDate = getMidnightOfDay(transaction.getTransactionDate());
 
-		statisticMap.get(curTransactionDate).addAndGet(transaction.getAmount());
-	}
-
+	// 해당 날짜의 자정 시간을 반환. ex) 2023-01-01T22:02:41 -> 2023-01-01T00:00:00
 	private Instant getMidnightOfDay(Instant time) {
-		return time.minusSeconds(time.getEpochSecond() % DAY_TIME_SECONDS);
+		return Instant.ofEpochSecond(time.atZone(ZoneOffset.UTC).toLocalDate().toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC));
 	}
 
+	// 통계할 시간을 일정 크기만큼 분할
 	private List<Instant> getSplitTimes(Instant startTime, Instant endDay) {
 		List<Instant> splitTimes = new ArrayList<>();
 
@@ -124,21 +102,13 @@ public class TransactionStatisticService {
 		return splitTimes;
 	}
 
-	private List<TransactionStatistic> getStatistics(Map<Instant, AtomicLong> statisticMap, long cumulativeAmount) {
-		List<TransactionStatistic> statistics = new ArrayList<>();
-		for (var entry : statisticMap.entrySet()) {
-			cumulativeAmount += entry.getValue().get();
-
-			TransactionStatistic transactionStatistic = TransactionStatistic.builder()
-				.statisticDate(entry.getKey())
-				.dailyTotalAmount(entry.getValue().get())
-				.cumulativeAmount(cumulativeAmount)
-				.build();
-
-			statistics.add(transactionStatistic);
+	// 거래 내역의 날짜가 집계하는 날짜와 같으면 dailyAmount에 추가하고 아니면 cumulativeAmount에만 추가합니다.
+	private void addAmount(AtomicLong dailyAmount, AtomicLong cumulativeAmount, Transaction transaction, Instant theDay) {
+		if (getMidnightOfDay(transaction.getTransactionDate()).equals(getMidnightOfDay(theDay))) {
+			dailyAmount.addAndGet(transaction.getAmount());
 		}
 
-		return statistics;
+		cumulativeAmount.addAndGet(transaction.getAmount());
 	}
 
 	@Scheduled(cron = "0 0 4 * * *")

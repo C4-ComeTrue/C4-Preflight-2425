@@ -2,7 +2,6 @@ package org.c4marathon.assignment.statistic.domain;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 import org.c4marathon.assignment.statistic.infrastructure.TransactionStatisticJpaRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,8 +18,8 @@ public class TransactionStatisticRepository {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	public Optional<TransactionStatistic> findCloseStatisticByStatisticDate(Instant theDay) {
-		return statisticJpaRepository.findCloseStatisticByStatisticDate(theDay);
+	public void save(TransactionStatistic statistic) {
+		statisticJpaRepository.save(statistic);
 	}
 
 	public void saveAll(List<TransactionStatistic> transactionStatistics) {

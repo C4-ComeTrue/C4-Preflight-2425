@@ -1,8 +1,8 @@
 package org.c4marathon.assignment.global.util;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Component;
@@ -12,32 +12,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class CustomThreadPoolExecutor implements Executor {
-	private int queueSize;
-	private int threadCount;
-	private ThreadPoolExecutor threadPoolExecutor;
+	private static final int THREAD_COUNT = 8;
+
+	private ExecutorService threadPoolExecutor;
 	private RuntimeException exception;
 
-	private void init() {
-		this.queueSize = 100;
-		this.threadCount = 8;
-		this.threadPoolExecutor = new ThreadPoolExecutor(threadCount, threadCount, 0L, TimeUnit.MILLISECONDS,
-			new LinkedBlockingQueue<>(queueSize), (r, executor) -> {
-			try {
-				executor.getQueue().put(r);
-			} catch (InterruptedException e) {
-				log.error(e.toString(), e);
-				Thread.currentThread().interrupt();
-			}
-		});
+	public void init() {
+		this.threadPoolExecutor = Executors.newFixedThreadPool(THREAD_COUNT);
+
 	}
 
 	@Override
 	public void execute(Runnable command) {
-		if (threadPoolExecutor != null && (threadPoolExecutor.isTerminated() || threadPoolExecutor.isTerminating())) {
+		if (threadPoolExecutor == null) {
 			return;
 		}
 
-		init();
+		if (threadPoolExecutor.isTerminated() || threadPoolExecutor.isShutdown()) {
+			return;
+		}
 
 		threadPoolExecutor.execute(() -> {
 			try {
@@ -75,6 +68,6 @@ public class CustomThreadPoolExecutor implements Executor {
 	}
 
 	private boolean isInvalidState() {
-		return threadPoolExecutor == null || threadPoolExecutor.isTerminating() || threadPoolExecutor.isTerminated();
+		return threadPoolExecutor == null || threadPoolExecutor.isShutdown() || threadPoolExecutor.isTerminated();
 	}
 }
