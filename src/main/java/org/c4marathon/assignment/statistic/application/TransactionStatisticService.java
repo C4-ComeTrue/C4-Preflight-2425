@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import org.c4marathon.assignment.global.util.QueryTemplate;
 import org.c4marathon.assignment.statistic.domain.TransactionStatistic;
@@ -22,6 +20,7 @@ import org.c4marathon.assignment.statistic.domain.TransactionStatisticRepository
 import org.c4marathon.assignment.statistic.dto.TransactionStatisticResult;
 import org.c4marathon.assignment.transaction.domain.Transaction;
 import org.c4marathon.assignment.transaction.domain.TransactionRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +43,13 @@ public class TransactionStatisticService {
 		this.transactionStatisticRepository = transactionStatisticRepository;
 	}
 
+	/**
+	 * theDay까지(해당 일 23:59:59까지) 통계를 집계합니다.
+	 * @param theDay
+	 * @return
+	 */
 	public TransactionStatisticResult aggregate(Instant theDay) {
+		log.info("theDay: {}", theDay);
 		Optional<TransactionStatistic> statisticOptional = statisticRepository.findCloseStatisticByStatisticDate(theDay);
 
 		if (statisticOptional.isPresent() && Objects.equals(statisticOptional.get().getStatisticDate(), theDay)) {
@@ -128,5 +133,10 @@ public class TransactionStatisticService {
 		}
 
 		return statistics;
+	}
+
+	@Scheduled(cron = "0 0 4 * * *")
+	private void calculateStatistic() {
+		aggregate(Instant.now().plus(9L, ChronoUnit.HOURS));
 	}
 }
