@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CumulativeJpaRepository extends JpaRepository<CumulativeAmount, Integer> {
@@ -17,7 +18,7 @@ public interface CumulativeJpaRepository extends JpaRepository<CumulativeAmount,
 			FROM CumulativeAmount c
 			WHERE c.date = :date
 		""")
-	CumulativeAmount findByDate(@Param("date") LocalDate date);
+	Optional<CumulativeAmount> findByDate(@Param("date") LocalDate date);
 
 	@Query("""
 			SELECT c

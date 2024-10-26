@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,11 +18,15 @@ public class CumulativeRepository {
 		return cumulativeJpaRepository.findByDateBetween(startDate, endDate);
 	}
 
-	public CumulativeAmount findByDate(LocalDate date) {
+	public Optional<CumulativeAmount> findByDate(LocalDate date) {
 		return cumulativeJpaRepository.findByDate(date);
 	}
 
 	public void save(CumulativeAmount cumulativeAmount) {
 		cumulativeJpaRepository.save(cumulativeAmount);
+	}
+
+	public void saveAll(List<CumulativeAmount> cumulativeAmountList){
+		cumulativeJpaRepository.saveAll(cumulativeAmountList);
 	}
 }

@@ -17,8 +17,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,14 +37,69 @@ public class CumulativeAmountService {
 	 */
 	public CumulativeAmountResponse getCumulativeAmountDate(LocalDate date) {
 
-		// 1. 해당 날짜의 통계 테이블이 있으면 return
-		CumulativeAmount cumulativeAmount = cumulativeRepository.findByDate(date);
-		if (cumulativeAmount != null) {
-			return new CumulativeAmountResponse(cumulativeAmount);
-		}
-		calTransationAmount(date);
+		Instant endDate = date.atStartOfDay(ZoneOffset.UTC).plusDays(1).toInstant();
 
-		return new CumulativeAmountResponse(cumulativeRepository.findByDate(date));
+		//배치 일괄처리용 맵
+		Map<LocalDate, Long> accumulatedMap = new HashMap<>();
+		C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursorAndPageLimit(
+			-1, 1000,
+			lastTransaction -> transactionRepository.findTransactionUntilDate(
+				endDate,
+				lastTransaction == null ? null : lastTransaction.getTransactionDate(),
+				lastTransaction == null ? null : lastTransaction.getId(),
+				1000
+			),
+			transactionList -> calDailyAmountByDate(transactionList, accumulatedMap) // 누적 맵을 넘겨줌
+		);
+
+		batchUpdateCumulativeAmounts(accumulatedMap);
+		//누적금액 구해서 다시 계산
+
+
+		CumulativeAmount cumulativeAmount = cumulativeRepository.findByDate(date)
+			.orElseGet(() -> new CumulativeAmount(date, 0L, 0L));
+
+		return new CumulativeAmountResponse(cumulativeAmount);
+	}
+
+	/**
+	 * 누적금액 다시 구하기
+	 * */
+	private void calCumulativeAmountByDate(){
+
+	}
+
+	/**
+	 * Transaction 거래 내역 List로 받아서 통계를 내는 로직
+	 * */
+	private void calDailyAmountByDate(List<Transaction> transactionList, Map<LocalDate, Long> accumulatedMap) {
+
+		Map<LocalDate, Long> map = transactionList.stream()
+			.collect(Collectors.groupingBy(
+				transaction -> transaction.getTransactionDate().atZone(ZoneOffset.UTC).toLocalDate(),
+				Collectors.summingLong(Transaction::getAmount)
+			));
+
+		map.forEach((date, amount) -> accumulatedMap.merge(date, amount, Long::sum));
+	}
+
+	/**
+	 * 배치로 한번에 업데이트
+	 * */
+	private void batchUpdateCumulativeAmounts(Map<LocalDate, Long> accumulatedMap) {
+		List<CumulativeAmount> cumulativeAmountsToUpdate = new ArrayList<>();
+
+		accumulatedMap.forEach((date, amount) -> {
+			CumulativeAmount cumulativeAmount = cumulativeRepository.findByDate(date)
+				.orElseGet(() -> new CumulativeAmount(date, 0L, 0L));
+
+			cumulativeAmount.updateDailyAmount(amount);
+
+			cumulativeAmountsToUpdate.add(cumulativeAmount);
+		});
+
+		// 배치 업데이트 수행
+		cumulativeRepository.saveAll(cumulativeAmountsToUpdate);
 	}
 
 	/**
@@ -51,7 +109,8 @@ public class CumulativeAmountService {
 	public List<CumulativeAmountResponse> getCumulativeAmountRangeDate(LocalDate startDate, LocalDate endDate) {
 
 		List<CumulativeAmountResponse> responseList = new ArrayList<>();
-		List<CumulativeAmount> cumulativeAmounts = cumulativeRepository.findByDateBetween(startDate, endDate.plusDays(1));
+		List<CumulativeAmount> cumulativeAmounts = cumulativeRepository.findByDateBetween(startDate,
+			endDate.plusDays(1));
 
 		LocalDate currentDate = startDate;
 		while (!currentDate.isAfter(endDate)) {
@@ -65,7 +124,8 @@ public class CumulativeAmountService {
 			long dailyAmount = (matchingAmount != null) ? matchingAmount.getDailyAmount() : 0L;
 			long cumulativeAmount = (matchingAmount != null) ? matchingAmount.getCumulativeAmount() : 0L;
 
-			CumulativeAmountResponse response = new CumulativeAmountResponse(currentDate, currentDate, dailyAmount, cumulativeAmount);
+			CumulativeAmountResponse response = new CumulativeAmountResponse(currentDate, currentDate, dailyAmount,
+				cumulativeAmount);
 			responseList.add(response);
 
 			// 다음 날짜로 이동하며 값이 있는지 체크
@@ -74,57 +134,56 @@ public class CumulativeAmountService {
 
 		return responseList;
 
-
 	}
 
 	/**
 	 * 주어진 날짜까지의 통계 저장하는 로직
 	 * */
-	private void calTransationAmount(LocalDate date) {
-		//1. Transaction에 존재하는 첫날부터 ~date까지 계산 예정
-		Instant earliestTransactionDate = transactionRepository.findEarliestTransactionDate(); //1월 1일
-		LocalDate currentDate = earliestTransactionDate.atZone(ZoneOffset.UTC).toLocalDate(); //1월 1일
-
-		//2.매일 하루치마다 dailyAmount 구하기
-		while (!currentDate.isAfter(date)) {
-			// 3. 해당 날짜에 이미 값이 존재하면 패스
-			if (cumulativeRepository.findByDate(currentDate) != null) {
-				currentDate = currentDate.plusDays(1);
-				continue;
-			}
-			//4. 해당 일의 dailyAmount 값
-			long dailyAmount = calculateDailyAmount(currentDate).get();
-
-			//5. 만약 첫번째로 존재하는 날이라면 당연히 DB가 비어있을 테니 총 누적금액도 일별누적금액과 동일하다.
-			if (currentDate.equals(earliestTransactionDate.atZone(ZoneOffset.UTC).toLocalDate())) {
-				saveCumulativeAmount(currentDate, dailyAmount, dailyAmount);
-			} else {
-				//6. 그 이후로는 전날의 값을 조회하고 오늘의 일별 누적 금액 더해서 저장
-				CumulativeAmount previousCA = cumulativeRepository.findByDate(currentDate.minusDays(1));
-				long cumulativeTotal = previousCA.getCumulativeAmount() + dailyAmount;
-				saveCumulativeAmount(currentDate, dailyAmount, cumulativeTotal);
-			}
-			//7. 다음날을 비교한다.
-			currentDate = currentDate.plusDays(1);
-		}
-	}
+	// private void calTransationAmount(LocalDate date) {
+	// 	//1. Transaction에 존재하는 첫날부터 ~date까지 계산 예정
+	// 	Instant earliestTransactionDate = transactionRepository.findEarliestTransactionDate(); //1월 1일
+	// 	LocalDate currentDate = earliestTransactionDate.atZone(ZoneOffset.UTC).toLocalDate(); //1월 1일
+	//
+	// 	//2.매일 하루치마다 dailyAmount 구하기
+	// 	while (!currentDate.isAfter(date)) {
+	// 		// 3. 해당 날짜에 이미 값이 존재하면 패스
+	// 		if (cumulativeRepository.findByDate(currentDate) != null) {
+	// 			currentDate = currentDate.plusDays(1);
+	// 			continue;
+	// 		}
+	// 		//4. 해당 일의 dailyAmount 값
+	// 		long dailyAmount = calculateDailyAmount(currentDate).get();
+	//
+	// 		//5. 만약 첫번째로 존재하는 날이라면 당연히 DB가 비어있을 테니 총 누적금액도 일별누적금액과 동일하다.
+	// 		if (currentDate.equals(earliestTransactionDate.atZone(ZoneOffset.UTC).toLocalDate())) {
+	// 			saveCumulativeAmount(currentDate, dailyAmount, dailyAmount);
+	// 		} else {
+	// 			//6. 그 이후로는 전날의 값을 조회하고 오늘의 일별 누적 금액 더해서 저장
+	// 			CumulativeAmount previousCA = cumulativeRepository.findByDate(currentDate.minusDays(1));
+	// 			long cumulativeTotal = previousCA.getCumulativeAmount() + dailyAmount;
+	// 			saveCumulativeAmount(currentDate, dailyAmount, cumulativeTotal);
+	// 		}
+	// 		//7. 다음날을 비교한다.
+	// 		currentDate = currentDate.plusDays(1);
+	// 	}
+	// }
 
 	/**
 	 * 하루치 트랜잭션 합산 (dailyAmount 계산)
 	 */
-	private AtomicLong calculateDailyAmount(LocalDate currentDate) {
-		AtomicLong dailyAmount = new AtomicLong();
-		Instant startOfDay = currentDate.atStartOfDay(ZoneOffset.UTC).toInstant();
-		Instant endOfDay = currentDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
-		C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursorAndPageLimit(-1, 1000,
-			lastTransaction -> transactionRepository.findOneDayTransaction(startOfDay, endOfDay,
-				lastTransaction == null ? null : lastTransaction.getTransactionDate(),
-				lastTransaction == null ? null : lastTransaction.getId(), 1000),
-			transactionList -> dailyAmount.addAndGet(transactionList.stream().mapToLong(Transaction::getAmount).sum()));
-
-		return dailyAmount;
-	}
+	// private AtomicLong calculateDailyAmount(LocalDate currentDate) {
+	// 	AtomicLong dailyAmount = new AtomicLong();
+	// 	Instant startOfDay = currentDate.atStartOfDay(ZoneOffset.UTC).toInstant();
+	// 	Instant endOfDay = currentDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+	//
+	// 	C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursorAndPageLimit(-1, 1000,
+	// 		lastTransaction -> transactionRepository.findOneDayTransaction(startOfDay, endOfDay,
+	// 			lastTransaction == null ? null : lastTransaction.getTransactionDate(),
+	// 			lastTransaction == null ? null : lastTransaction.getId(), 1000),
+	// 		transactionList -> dailyAmount.addAndGet(transactionList.stream().mapToLong(Transaction::getAmount).sum()));
+	//
+	// 	return dailyAmount;
+	// }
 
 	/**
 	 *  CumulativeAmount 객체를 생성하여 저장하는 메서드
