@@ -24,26 +24,38 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Int
     @Query("""
     SELECT t
     FROM Transaction t
-    WHERE (t.transactionDate > :lastDate OR (t.transactionDate = :lastDate AND t.id > :lastId))
+    WHERE (t.transactionDate > :transactionDate OR (t.transactionDate = :transactionDate AND t.id > :id))
     AND DATE(t.transactionDate) <= :endDate
     ORDER BY t.transactionDate ASC, t.id ASC
     LIMIT :size
     """)
     List<Transaction> findTransactionWithEndDateAndLastDate(
             @Param("endDate") LocalDate endDate,
-            @Param("lastDate") Instant lastDate,
-            @Param("lastId") Integer lastId,
+            @Param("transactionDate") Instant transactionDate,
+            @Param("id") int id,
             @Param("size") int size
     );
 
     @Query("""
     SELECT t
     FROM Transaction t
-    WHERE DATE(t.transactionDate) = :date
+    WHERE DATE(t.transactionDate) = :transactionDate
     ORDER BY t.transactionDate ASC, t.id ASC
     LIMIT :size
     """)
-    List<Transaction> findTransactionByDate(@Param("date") LocalDate date, @Param("size") int size);
+    List<Transaction> findTransactionByDate(@Param("transactionDate") LocalDate transactionDate, @Param("size") int size);
 
 
+    @Query("""
+    SELECT SUM(t.amount)
+    FROM Transaction t
+    """)
+    Long findAllTransactionAmountSum();
+
+    @Query("""
+    SELECT SUM(t.amount)
+    FROM Transaction t
+    WHERE DATE(t.transactionDate) < :transactionDate
+    """)
+    Long findAllTransactionAmountSumBeforeDate(@Param("transactionDate") LocalDate transactionDate);
 }

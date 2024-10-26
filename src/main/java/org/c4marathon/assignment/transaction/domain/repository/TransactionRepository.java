@@ -13,17 +13,26 @@ import java.util.List;
 public class TransactionRepository {
     private final TransactionJpaRepository transactionJpaRepository;
 
-    public List<Transaction> findTransactionByLastDate(LocalDate endDate, Instant lastDate, int lastId, int size) {
-        if (lastDate == null) {
+    public List<Transaction> findTransactionByLastDate(LocalDate endDate, Instant transactionDate, int id, int size) {
+        if (transactionDate == null) {
             return transactionJpaRepository.findTransaction(size);
         }
-        return transactionJpaRepository.findTransactionWithEndDateAndLastDate(endDate, lastDate, lastId, size);
+        return transactionJpaRepository.findTransactionWithEndDateAndLastDate(endDate, transactionDate, id, size);
     }
 
-    public List<Transaction> findTransactionByDate(LocalDate endDate, Instant lastDate, int lastId, int size) {
-        if (lastDate == null) {
+    public List<Transaction> findTransactionByDate(LocalDate endDate, Instant transactionDate, int id, int size) {
+        if (transactionDate == null) {
             return transactionJpaRepository.findTransactionByDate(endDate, size);
         }
-        return transactionJpaRepository.findTransactionWithEndDateAndLastDate(endDate, lastDate, lastId, size);
+        return transactionJpaRepository.findTransactionWithEndDateAndLastDate(endDate, transactionDate, id, size);
     }
+
+    public Long getAllTransactionAmountSum() {
+        return transactionJpaRepository.findAllTransactionAmountSum();
+    }
+
+    public Long getAllTransactionAmountSumBeforeDate(LocalDate date) {
+        return transactionJpaRepository.findAllTransactionAmountSumBeforeDate(date);
+    }
+
 }

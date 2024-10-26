@@ -18,7 +18,7 @@ public class StatisticsController {
     private final StatisticsService statisticsService;
 
     @PostMapping("/statistics")
-    public ResponseEntity<Void> getStatistics(@RequestParam int pageSize, @RequestParam @NotNull LocalDate date) {
+    public ResponseEntity<Void> calculateStatistics(@RequestParam int pageSize, @RequestParam @NotNull LocalDate date) {
         statisticsService.calculateStatistics(pageSize, date);
         return ResponseEntity.noContent().build();
     }
@@ -29,6 +29,12 @@ public class StatisticsController {
             @RequestParam("endDate") @NotNull LocalDate endDate
     ) {
         List<StatisticsResponse> statisticsByDate = statisticsService.getStatisticsByStartDateAndEndDate(startDate, endDate);
-        return ResponseEntity.status(HttpStatus.CREATED).body(statisticsByDate);
+        return ResponseEntity.ok(statisticsByDate);
+    }
+
+    @PostMapping("/statistics/date")
+    public ResponseEntity<Void> calculateStatisticsForDate(@RequestParam @NotNull LocalDate date) {
+        statisticsService.calculateStatisticsForDay(date);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
