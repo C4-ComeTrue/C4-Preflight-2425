@@ -43,6 +43,12 @@ public class TransactionStatisticService {
 		this.transactionStatisticRepository = transactionStatisticRepository;
 	}
 
+	public List<TransactionStatisticResult> findAll(Instant start, Instant end) {
+		List<TransactionStatistic> statistics = transactionStatisticRepository.findAll(start, end);
+
+		return statistics.stream().map(TransactionStatisticResult::from).toList();
+	}
+
 	/**
 	 * theDay까지(해당 일 23:59:59까지) 통계를 집계합니다.
 	 * @param theDay

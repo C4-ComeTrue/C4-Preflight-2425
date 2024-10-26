@@ -23,10 +23,6 @@ public class TransactionStatisticRepository {
 		return statisticJpaRepository.findCloseStatisticByStatisticDate(theDay);
 	}
 
-	public void save(TransactionStatistic transactionStatistic) {
-		statisticJpaRepository.save(transactionStatistic);
-	}
-
 	public void saveAll(List<TransactionStatistic> transactionStatistics) {
 		String sql = """
 			INSERT INTO transaction_statistic_zzamba (statistic_date, daily_total_amount, cumulative_amount)
@@ -38,5 +34,9 @@ public class TransactionStatisticRepository {
 			ps.setLong(2, statistic.getDailyTotalAmount());
 			ps.setLong(3, statistic.getCumulativeAmount());
 		});
+	}
+
+	public List<TransactionStatistic> findAll(Instant start, Instant end) {
+		return statisticJpaRepository.findByStatisticDateBetween(start, end);
 	}
 }

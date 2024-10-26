@@ -1,6 +1,7 @@
 package org.c4marathon.assignment.statistic.infrastructure;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.c4marathon.assignment.statistic.domain.TransactionStatistic;
@@ -17,4 +18,6 @@ public interface TransactionStatisticJpaRepository extends JpaRepository<Transac
 		LIMIT 1
 	""", nativeQuery = true)
 	Optional<TransactionStatistic> findCloseStatisticByStatisticDate(Instant theDay);
+
+	List<TransactionStatistic> findByStatisticDateBetween(Instant start, Instant end);
 }

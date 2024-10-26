@@ -2,6 +2,7 @@ package org.c4marathon.assignment.statistic.controller;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import org.c4marathon.assignment.statistic.application.TransactionStatisticService;
 import org.c4marathon.assignment.statistic.dto.TransactionStatisticResult;
@@ -23,5 +24,11 @@ public class TransactionStatisticController {
 	@GetMapping("/aggregate")
 	public ResponseEntity<TransactionStatisticResult> aggregate(@RequestParam LocalDate theDay) {
 		return ResponseEntity.ok(statisticService.aggregate(theDay.atStartOfDay(ZoneOffset.UTC).toInstant()));
+	}
+
+	@GetMapping("/range")
+	public ResponseEntity<List<TransactionStatisticResult>> findAll(@RequestParam LocalDate startTime, @RequestParam LocalDate endTime) {
+		return ResponseEntity.ok(statisticService.findAll(startTime.atStartOfDay(ZoneOffset.UTC).toInstant(),
+			endTime.atStartOfDay(ZoneOffset.UTC).toInstant()));
 	}
 }
