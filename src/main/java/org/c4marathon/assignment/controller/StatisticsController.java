@@ -1,6 +1,6 @@
 package org.c4marathon.assignment.controller;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.c4marathon.assignment.controller.response.CumulativeAmountResponse;
 import org.c4marathon.assignment.service.CumulativeAmountService;
@@ -26,7 +26,7 @@ public class StatisticsController {
      *
      */
     @GetMapping("/cumulative")
-    public ResponseEntity<CumulativeAmountResponse> getCumulativeAmountDate(@RequestParam @NotBlank @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+    public ResponseEntity<CumulativeAmountResponse> getCumulativeAmountDate(@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         return ResponseEntity.ok(cumulativeAmountService.getCumulativeAmountDate(date));
     }
 
@@ -34,7 +34,7 @@ public class StatisticsController {
      * 2. 주어진 날짜 사이의 통계값을 조회 하는 API
      */
     @GetMapping("/cumulative/range")
-    public ResponseEntity<List<CumulativeAmountResponse>> getCumulativeAmountRangeDate(@RequestParam @NotBlank @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam @NotBlank @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    public ResponseEntity<List<CumulativeAmountResponse>> getCumulativeAmountRangeDate(@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
         return ResponseEntity.ok(cumulativeAmountService.getCumulativeAmountRangeDate(startDate, endDate));
     }
 }
