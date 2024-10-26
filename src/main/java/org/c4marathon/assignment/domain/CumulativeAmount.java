@@ -42,11 +42,9 @@ public class CumulativeAmount {
 		this.cumulativeAmount = cumulativeAmount;
 	}
 
-	public void updateDailyAmount(Long dailyAmount){
+	public void update(LocalDate date, Long dailyAmount, Long cumulativeAmount) {
+		this.date = date;
 		this.dailyAmount = dailyAmount;
-	}
-
-	public void updateCumulativeAmount(Long cumulativeAmount){
 		this.cumulativeAmount = cumulativeAmount;
 	}
 
