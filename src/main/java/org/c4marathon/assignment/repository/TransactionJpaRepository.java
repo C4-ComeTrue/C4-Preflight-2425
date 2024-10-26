@@ -40,4 +40,17 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
 		@Param("endDate") Instant endDate, @Param("lastDate") Instant lastDate, @Param("lastDateId") int lastDateId,
 		@Param("size") int size);
 
+	@Query("""
+		SELECT SUM(t.amount)
+		FROM Transaction t
+		WHERE t.transactionDate >= :startDate AND t.transactionDate < :endDate
+		""")
+	long sumOfAmountByOneDate(@Param("startDate") Instant startDate, @Param("endDate") Instant endDate);
+
+	@Query("""
+		SELECT SUM(t.amount)
+		FROM Transaction t
+		WHERE t.transactionDate < :endDate
+		""")
+	long sumCumulativeAmountUntilDate(@Param("endDate") Instant endDate);
 }

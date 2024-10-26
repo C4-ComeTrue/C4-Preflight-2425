@@ -23,7 +23,7 @@ public class StatisticsController {
 	private final CumulativeAmountService cumulativeAmountService;
 
 	/**
-	 * 1. 특정 날짜의 통계를 강제로 집계 하는 API
+	 * 1. 특정 날짜까지 강제로 집계 하는 API
 	 *
 	 */
 	@GetMapping("/cumulative")

@@ -33,4 +33,19 @@ public class TransactionRepository {
 			lastDateId, size);
 	}
 
+
+	/**
+	 *  하루치에 대한 dailyAmount 계산 Full Scan
+	 */
+	public long sumOfAmountByOneDate(Instant startDate, Instant endDate) {
+		return transactionJpaRepository.sumOfAmountByOneDate(startDate, endDate);
+	}
+
+	/**
+	 *  date를 기준으로 이전날짜 까지릐 전체 Amount 계산
+	 */
+	public long sumCumulativeAmountUntilDate(Instant endDate) {
+		return transactionJpaRepository.sumCumulativeAmountUntilDate(endDate);
+	}
+
 }

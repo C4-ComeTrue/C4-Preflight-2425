@@ -30,7 +30,7 @@ public class CumulativeAmountService {
 
 	/**
 	 * [1] API : statics/cumulative
-	 * transaction의 ~ date(endDate) 까지의 일별/누적금액 계산하는 로직
+	 * transaction의 ~ date(endDate) 까지의 일별/누적금액 강제로 무조건 계산하는 로직
 	 */
 	public CumulativeAmountResponse getCumulativeAmountDate(LocalDate date) {
 
@@ -136,18 +136,20 @@ public class CumulativeAmountService {
 	}
 
 	/**
-	 * [3] Scheduler : 새벽 4시 마다, 전날의 통계 집계가 진행된다.
+	 * [3] Scheduler
+	 * - 새벽 4시 마다, 전날의 통계 집계가 진행된다.
+	 * - 주의할 점
+	 * 	 (1) 일별 누적과, 전체 누적은 매번 다시 수행한다.
+	 *   (2) 이전날의 값들에 의존하면 안된다
 	 */
 	@Scheduled(cron = "0 0 4 * * *")
 	protected void cumulativeScheduler() {
-		LocalDate yesterday = LocalDate.now().minusDays(1);
-		long dailyAmount = calculateDailyAmount(yesterday).get();
+		Instant yesterDay = LocalDate.now().minusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+		Instant today = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant();
 
-		LocalDate twoDaysAgo = yesterday.minusDays(1);
-		CumulativeAmount twoDaysAgoCA = cumulativeRepository.findByDate(twoDaysAgo);
-		long cumulativeTotal = (twoDaysAgoCA != null ? twoDaysAgoCA.getCumulativeAmount() : 0L) + dailyAmount;
-
-		saveCumulativeAmount(yesterday, dailyAmount, cumulativeTotal);
+		long dailyAmount = transactionRepository.sumOfAmountByOneDate(yesterDay, today);
+		long cumulativeAmount = transactionRepository.sumCumulativeAmountUntilDate(today);
+		saveCumulativeAmount(LocalDate.now().minusDays(1), dailyAmount, cumulativeAmount);
 	}
 
 }
