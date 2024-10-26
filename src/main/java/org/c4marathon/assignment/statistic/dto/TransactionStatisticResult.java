@@ -9,10 +9,10 @@ public record TransactionStatisticResult(LocalDate date,
 										 long cumulativeAmount) {
 
 	public static TransactionStatisticResult from(TransactionStatistic transactionStatistic) {
-		long epochSecond = transactionStatistic.getStatisticDate().getEpochSecond();
+		long epochDay = transactionStatistic.getStatisticDate().getEpochSecond() / (60L * 60L * 24L);
 
 		return new TransactionStatisticResult(
-			LocalDate.ofEpochDay(epochSecond),
+			LocalDate.ofEpochDay(epochDay),
 			transactionStatistic.getDailyTotalAmount(),
 			transactionStatistic.getCumulativeAmount()
 		);
