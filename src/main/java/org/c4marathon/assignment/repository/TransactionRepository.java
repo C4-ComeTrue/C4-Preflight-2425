@@ -19,9 +19,9 @@ public class TransactionRepository {
 
 	/**
 	 *  주어진 lastDate를 활용하여, size 만큼의 Transaction 정보를 가져온다.
-	 *  @param lastDate
-	 *  @param size
-	 *  @return
+	 *  @param lastDate : 페이징을 할때 1000개의 마지막 Date를 기반으로 다음 1000개의 순서보장
+	 *  @param size : 페이징을 할 크기 단위
+	 *  @return : List<Transaction>
 	 */
 	public List<Transaction> findOneDayTransaction(Instant startDate, Instant endDate, Instant lastDate,
 		Integer lastDateId, int size) {

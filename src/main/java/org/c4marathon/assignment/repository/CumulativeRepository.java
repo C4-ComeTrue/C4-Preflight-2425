@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.c4marathon.assignment.domain.CumulativeAmount;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor

@@ -54,31 +54,25 @@ public class CumulativeAmountService {
 		List<CumulativeAmountResponse> responses = new ArrayList<>();
 
 		//1. 만약 시작날짜의 값이 없다면 - (statics/cumulative가 JAVA heap 메모리 용량이 적어서 OOM 발생으로 인해 값을 다 못채움)
-		CumulativeAmount CA = cumulativeRepository.findByDate(endDate);
-		if (CA == null) {
+		CumulativeAmount cumulativeAmount = cumulativeRepository.findByDate(endDate);
+		if (cumulativeAmount == null) {
 			//2. endDate까지 값을 다 채워 넣는다.
 			calTransationAmount(endDate);
 		}
 		CumulativeAmount previousCA = cumulativeRepository.findByDate(startDate);
 		long cumulativeTotal = previousCA.getDailyAmount();
 
-		responses.add(new CumulativeAmountResponse(
-			startDate,
-			startDate,
-			previousCA.getDailyAmount(),
-			cumulativeTotal));
+		responses.add(new CumulativeAmountResponse(startDate, startDate, previousCA.getDailyAmount(), cumulativeTotal));
 
-		for (LocalDate currentDate = startDate.plusDays(1); !currentDate.isAfter(
-			endDate); currentDate = currentDate.plusDays(1)) {
+		LocalDate currentDate = startDate.plusDays(1);
+		while (!currentDate.isAfter(endDate)) {
 			CumulativeAmount currentCA = cumulativeRepository.findByDate(currentDate);
 			long dailyAmount = currentCA.getDailyAmount();
 			cumulativeTotal += dailyAmount;
 
-			responses.add(new CumulativeAmountResponse(
-				currentDate,
-				currentDate,
-				dailyAmount,
-				cumulativeTotal));
+			responses.add(new CumulativeAmountResponse(currentDate, currentDate, dailyAmount, cumulativeTotal));
+
+			currentDate = currentDate.plusDays(1);
 		}
 
 		return responses;
@@ -99,17 +93,17 @@ public class CumulativeAmountService {
 				currentDate = currentDate.plusDays(1);
 				continue;
 			}
-			//4. 해당 일의 dailtAmount 값
-			AtomicLong dailyAmount = calculateDailyAmount(currentDate);
+			//4. 해당 일의 dailyAmount 값
+			long dailyAmount = calculateDailyAmount(currentDate).get();
 
 			//5. 만약 첫번째로 존재하는 날이라면 당연히 DB가 비어있을 테니 총 누적금액도 일별누적금액과 동일하다.
 			if (currentDate.equals(earliestTransactionDate.atZone(ZoneOffset.UTC).toLocalDate())) {
-				saveCumulativeAmount(currentDate, dailyAmount.get(), dailyAmount.get());
+				saveCumulativeAmount(currentDate, dailyAmount, dailyAmount);
 			} else {
 				//6. 그 이후로는 전날의 값을 조회하고 오늘의 일별 누적 금액 더해서 저장
 				CumulativeAmount previousCA = cumulativeRepository.findByDate(currentDate.minusDays(1));
-				long cumulativeTotal = previousCA.getCumulativeAmount() + dailyAmount.get();
-				saveCumulativeAmount(currentDate, dailyAmount.get(), cumulativeTotal);
+				long cumulativeTotal = previousCA.getCumulativeAmount() + dailyAmount;
+				saveCumulativeAmount(currentDate, dailyAmount, cumulativeTotal);
 			}
 			//7. 다음날을 비교한다.
 			currentDate = currentDate.plusDays(1);
@@ -124,21 +118,11 @@ public class CumulativeAmountService {
 		Instant startOfDay = currentDate.atStartOfDay(ZoneOffset.UTC).toInstant();
 		Instant endOfDay = currentDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
 
-		C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursorAndPageLimit(
-			-1, 1000,
-			lastTransaction -> transactionRepository.findOneDayTransaction(
-				startOfDay,
-				endOfDay,
+		C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursorAndPageLimit(-1, 1000,
+			lastTransaction -> transactionRepository.findOneDayTransaction(startOfDay, endOfDay,
 				lastTransaction == null ? null : lastTransaction.getTransactionDate(),
-				lastTransaction == null ? null : lastTransaction.getId(),
-				1000
-			),
-			transactionList -> {
-				dailyAmount.addAndGet(transactionList.stream()
-					.mapToLong(Transaction::getAmount)
-					.sum());
-			}
-		);
+				lastTransaction == null ? null : lastTransaction.getId(), 1000),
+			transactionList -> dailyAmount.addAndGet(transactionList.stream().mapToLong(Transaction::getAmount).sum()));
 
 		return dailyAmount;
 	}
@@ -157,13 +141,13 @@ public class CumulativeAmountService {
 	@Scheduled(cron = "0 0 4 * * *")
 	protected void cumulativeScheduler() {
 		LocalDate yesterday = LocalDate.now().minusDays(1);
-		AtomicLong dailyAmount = calculateDailyAmount(yesterday);
+		long dailyAmount = calculateDailyAmount(yesterday).get();
 
 		LocalDate twoDaysAgo = yesterday.minusDays(1);
 		CumulativeAmount twoDaysAgoCA = cumulativeRepository.findByDate(twoDaysAgo);
-		long cumulativeTotal = (twoDaysAgoCA != null ? twoDaysAgoCA.getCumulativeAmount() : 0L) + dailyAmount.get();
+		long cumulativeTotal = (twoDaysAgoCA != null ? twoDaysAgoCA.getCumulativeAmount() : 0L) + dailyAmount;
 
-		saveCumulativeAmount(yesterday, dailyAmount.get(), cumulativeTotal);
+		saveCumulativeAmount(yesterday, dailyAmount, cumulativeTotal);
 	}
 
 }

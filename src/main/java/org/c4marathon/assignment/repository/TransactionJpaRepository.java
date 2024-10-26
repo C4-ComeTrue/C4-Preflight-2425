@@ -33,7 +33,7 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
 		WHERE ((t.transactionDate >= :startDate) AND (t.transactionDate < :endDate))
 		          AND (t.transactionDate > :lastDate)
 		          OR (t.transactionDate = :lastDate AND t.id > :lastDateId)
-		ORDER BY t.transactionDate, t.id 
+		ORDER BY t.transactionDate, t.id
 		LIMIT :size
 		""")
 	List<Transaction> findOneDayTransactionWithEndDateAndLastDate(@Param("startDate") Instant startDate,
