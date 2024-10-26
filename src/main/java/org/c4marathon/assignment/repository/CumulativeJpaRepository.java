@@ -7,10 +7,23 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface CumulativeJpaRepository extends JpaRepository<CumulativeAmount, Integer> {
 
-	@Query("SELECT c FROM CumulativeAmount c WHERE c.date = :date")
+	@Query("""
+			SELECT c
+			FROM CumulativeAmount c
+			WHERE c.date = :date
+		""")
 	CumulativeAmount findByDate(@Param("date") LocalDate date);
+
+	@Query("""
+			SELECT c
+			FROM CumulativeAmount c
+			WHERE c.date >= :startDate AND c.date < :endDate
+		""")
+	List<CumulativeAmount> findByDateBetween(@Param("startDate") LocalDate startDate,
+		@Param("endDate") LocalDate endDate);
 }

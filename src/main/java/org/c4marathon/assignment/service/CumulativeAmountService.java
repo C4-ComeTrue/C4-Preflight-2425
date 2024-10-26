@@ -46,36 +46,35 @@ public class CumulativeAmountService {
 
 	/**
 	 * [2] API : statics/cumulative/range
-	 * start ~ endDate 사이의 일별/누적 금액 다시 계산 하는 로직
-	 * startDate ~ endDate 까지 오고간 통계금액이 필요하기 때문에, 누적금액의 단순 테이블 조회가 아닌 시작일을 기준으로 다시 누적금액을 계산했다.
-	 * 예를들어, 1월 2일부터 5일까지면 1일의 누적금액은 당연히 빠져야한다.
+	 * start ~ endDate 사이의 날짜로 테이블 단순 조회
 	 */
 	public List<CumulativeAmountResponse> getCumulativeAmountRangeDate(LocalDate startDate, LocalDate endDate) {
-		List<CumulativeAmountResponse> responses = new ArrayList<>();
 
-		//1. 만약 시작날짜의 값이 없다면 - (statics/cumulative가 JAVA heap 메모리 용량이 적어서 OOM 발생으로 인해 값을 다 못채움)
-		CumulativeAmount cumulativeAmount = cumulativeRepository.findByDate(endDate);
-		if (cumulativeAmount == null) {
-			//2. endDate까지 값을 다 채워 넣는다.
-			calTransationAmount(endDate);
-		}
-		CumulativeAmount previousCA = cumulativeRepository.findByDate(startDate);
-		long cumulativeTotal = previousCA.getDailyAmount();
+		List<CumulativeAmountResponse> responseList = new ArrayList<>();
+		List<CumulativeAmount> cumulativeAmounts = cumulativeRepository.findByDateBetween(startDate, endDate.plusDays(1));
 
-		responses.add(new CumulativeAmountResponse(startDate, startDate, previousCA.getDailyAmount(), cumulativeTotal));
-
-		LocalDate currentDate = startDate.plusDays(1);
+		LocalDate currentDate = startDate;
 		while (!currentDate.isAfter(endDate)) {
-			CumulativeAmount currentCA = cumulativeRepository.findByDate(currentDate);
-			long dailyAmount = currentCA.getDailyAmount();
-			cumulativeTotal += dailyAmount;
+			LocalDate finalCurrentDate = currentDate;
+			CumulativeAmount matchingAmount = cumulativeAmounts.stream()
+				.filter(cumulative -> cumulative.getDate().equals(finalCurrentDate))
+				.findFirst()
+				.orElse(null);
 
-			responses.add(new CumulativeAmountResponse(currentDate, currentDate, dailyAmount, cumulativeTotal));
+			// 만약에 통계 테이블이 비어있다면 0을 출력
+			long dailyAmount = (matchingAmount != null) ? matchingAmount.getDailyAmount() : 0L;
+			long cumulativeAmount = (matchingAmount != null) ? matchingAmount.getCumulativeAmount() : 0L;
 
+			CumulativeAmountResponse response = new CumulativeAmountResponse(currentDate, currentDate, dailyAmount, cumulativeAmount);
+			responseList.add(response);
+
+			// 다음 날짜로 이동하며 값이 있는지 체크
 			currentDate = currentDate.plusDays(1);
 		}
 
-		return responses;
+		return responseList;
+
+
 	}
 
 	/**
