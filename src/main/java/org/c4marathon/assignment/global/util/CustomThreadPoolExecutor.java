@@ -1,0 +1,73 @@
+package org.c4marathon.assignment.global.util;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class CustomThreadPoolExecutor implements Executor {
+	private static final int THREAD_COUNT = 8;
+
+	private ExecutorService threadPoolExecutor;
+	private RuntimeException exception;
+
+	public void init() {
+		this.threadPoolExecutor = Executors.newFixedThreadPool(THREAD_COUNT);
+
+	}
+
+	@Override
+	public void execute(Runnable command) {
+		if (threadPoolExecutor == null) {
+			return;
+		}
+
+		if (threadPoolExecutor.isTerminated() || threadPoolExecutor.isShutdown()) {
+			return;
+		}
+
+		threadPoolExecutor.execute(() -> {
+			try {
+				command.run();
+			} catch (RuntimeException e) {
+				log.error("처리 중 예외 발생", e);
+				this.exception = e;
+			}
+		});
+	}
+
+	public void waitToEnd() {
+		if (isInvalidState()) {
+			return;
+		}
+
+		this.threadPoolExecutor.shutdown();
+
+		while (true) {
+			try {
+				if (threadPoolExecutor.awaitTermination(Integer.MAX_VALUE, TimeUnit.MILLISECONDS)) {
+					break;
+				}
+			} catch (InterruptedException e) {
+				log.error(e.toString(), e);
+				Thread.currentThread().interrupt();
+			}
+		}
+
+		threadPoolExecutor = null; // 임무를 다한 Executor 지우기
+
+		if (exception != null) { // hold한 예외 던지기
+			throw exception;
+		}
+	}
+
+	private boolean isInvalidState() {
+		return threadPoolExecutor == null || threadPoolExecutor.isShutdown() || threadPoolExecutor.isTerminated();
+	}
+}
