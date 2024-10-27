@@ -3,17 +3,17 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USER_ID}
     password: ${DB_USER_PASSWORD}
-    url: jdbc:mysql://${DB_URL}/large-scale?socketTimeout=2000
+    url: jdbc:mysql://${DB_URL}/large-scale?socketTimeout=5000&serverTimezone=UTC
     hikari:
       connection-timeout: 3000
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
-        use_sql_comments: true
+        format_sql: false
+        use_sql_comments: false
         dialect: org.hibernate.dialect.MySQLDialect
   mail:
     host: smtp.gmail.com

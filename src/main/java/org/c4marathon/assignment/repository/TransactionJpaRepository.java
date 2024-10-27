@@ -1,0 +1,49 @@
+package org.c4marathon.assignment.repository;
+
+import org.c4marathon.assignment.domain.Transaction;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.Instant;
+import java.util.List;
+
+@Repository
+public interface TransactionJpaRepository extends JpaRepository<Transaction, Long> {
+
+	@Query("""
+		SELECT t
+		FROM Transaction t
+		WHERE t.transactionDate < :endDate
+		ORDER BY t.transactionDate , t.id
+		LIMIT :size
+		""")
+	List<Transaction> findTransactionUntilDate(@Param("endDate") Instant endDate, @Param("size") int size);
+
+	@Query("""
+		SELECT t
+		FROM Transaction t
+		WHERE t.transactionDate < :endDate
+			AND (t.transactionDate > :lastDate)
+		    OR (t.transactionDate = :lastDate AND t.id > :lastDateId)
+		ORDER BY t.transactionDate , t.id
+		LIMIT :size
+		""")
+	List<Transaction> findTransactionUntilDateWithPaging(@Param("endDate") Instant endDate,
+		@Param("lastDate") Instant lastDate, @Param("lastDateId") int lastDateId, @Param("size") int size);
+
+	@Query("""
+		SELECT SUM(t.amount)
+		FROM Transaction t
+		WHERE t.transactionDate >= :startDate AND t.transactionDate < :endDate
+		""")
+	long sumOfAmountByOneDate(@Param("startDate") Instant startDate, @Param("endDate") Instant endDate);
+
+	@Query("""
+		SELECT SUM(t.amount)
+		FROM Transaction t
+		WHERE t.transactionDate < :endDate
+		""")
+	long sumCumulativeAmountUntilDate(@Param("endDate") Instant endDate);
+}
