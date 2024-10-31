@@ -31,8 +31,4 @@ public class EmailBox extends BaseEntity {
         this.content = content;
         this.status = EmailStatus.PENDING;
     }
-
-    public void sendEmailSuccess(){
-        this.status = EmailStatus.SUCCESS;
-    }
 }
