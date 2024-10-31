@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(
+        indexes = @Index(name = "idx_status", columnList = "status")
+)
 public class EmailBox extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
