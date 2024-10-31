@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class EmailBox extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false, length = 40)
     private String email;
