@@ -15,8 +15,10 @@ public class EmailController {
     private final EmailService emailService;
 
     @PostMapping()
-    public ResponseEntity<Void> postEmailLog(@RequestBody @Valid PostEmailBoxReq postEmailBoxReq) {
-        emailService.postEmailLog(postEmailBoxReq);
+    public ResponseEntity<Void> postEmailBox(@RequestBody @Valid PostEmailBoxReq postEmailBoxReq) {
+        emailService.postEmailBox(postEmailBoxReq);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
+
+
