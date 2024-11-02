@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(
+        name = "email_box_nyh365",
         indexes = @Index(name = "idx_status", columnList = "status")
 )
 public class EmailBox extends BaseEntity {
