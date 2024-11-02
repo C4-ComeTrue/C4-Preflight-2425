@@ -5,10 +5,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.c4marathon.assignment.dto.request.PostEmailBoxReq;
 import org.c4marathon.assignment.entity.EmailBox;
+import org.c4marathon.assignment.entity.EmailStatus;
 import org.c4marathon.assignment.repository.EmailBoxRepository;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -16,9 +24,39 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     private final EmailBoxRepository emailBoxRepository;
     private final JavaMailSender javaMailSender;
+    private final Executor asyncTaskExecutor;
 
     public void postEmailBox(PostEmailBoxReq postEmailBoxReq) {
         emailBoxRepository.postEmailBox(postEmailBoxReq);
+    }
+
+    @Scheduled(cron = "0 * * * * *")
+    public void postEmail() {
+        log.debug("{} post email start", Thread.currentThread().getName());
+
+        List<EmailBox> emailBoxes = emailBoxRepository.getEmailBoxesByStatus(EmailStatus.PENDING);
+        if(emailBoxes.isEmpty()) {
+            return;
+        }
+
+        List<CompletableFuture<Long>> futures = emailBoxes.stream()
+                .map(emailBox -> CompletableFuture.supplyAsync(() -> makeEmail(emailBox), asyncTaskExecutor)
+                        .completeOnTimeout(null, 5, TimeUnit.SECONDS))
+                .toList();
+
+        List<Long> sentEmailIds = futures.stream()
+                .map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .parallel()
+                .toList();
+
+        log.debug("post email end : {}개", sentEmailIds.size());
+
+        if (sentEmailIds.isEmpty()) {
+            return;
+        }
+
+        emailBoxRepository.updateStatus(EmailStatus.SUCCESS, sentEmailIds);
     }
 
     public Long makeEmail(EmailBox emailBox) {
