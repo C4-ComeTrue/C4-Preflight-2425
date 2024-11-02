@@ -11,12 +11,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,16 +40,15 @@ public class EmailService {
             return;
         }
 
-        List<CompletableFuture<Long>> futures = emailBoxes.stream()
-                .map(emailBox -> CompletableFuture.supplyAsync(() -> makeEmail(emailBox), asyncTaskExecutor)
-                        .completeOnTimeout(null, 5, TimeUnit.SECONDS))
-                .toList();
+        ArrayList<CompletableFuture<Long>> futures = emailBoxes.stream()
+                .map(emailBox -> CompletableFuture.supplyAsync(() -> makeEmail(emailBox), asyncTaskExecutor))
+                .collect(Collectors.toCollection(ArrayList::new));
 
-        List<Long> sentEmailIds = futures.stream()
+        ArrayList<Long> sentEmailIds = futures.stream()
                 .map(CompletableFuture::join)
                 .filter(Objects::nonNull)
                 .parallel()
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
         log.debug("post email end : {}개", sentEmailIds.size());
 
