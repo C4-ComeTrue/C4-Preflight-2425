@@ -33,7 +33,7 @@ public class EmailService {
         log.debug("{} post email start", Thread.currentThread().getName());
 
         List<EmailBox> emailBoxes = emailBoxRepository.getEmailBoxesByStatus(EmailStatus.PENDING);
-        if(emailBoxes.isEmpty()) {
+        if (emailBoxes.isEmpty()) {
             return;
         }
 
