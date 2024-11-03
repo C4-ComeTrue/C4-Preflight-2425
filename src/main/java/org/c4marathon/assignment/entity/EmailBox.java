@@ -1,6 +1,7 @@
 package org.c4marathon.assignment.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class EmailBox extends BaseEntity {
     @Column(nullable = false, length = 40)
     private String email;
 
+    @Size(max = 500)
     @Column(nullable = false)
     private String content;
 
