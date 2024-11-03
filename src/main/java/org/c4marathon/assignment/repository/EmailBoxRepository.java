@@ -1,6 +1,7 @@
 package org.c4marathon.assignment.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
 import org.c4marathon.assignment.dto.request.PostEmailBoxReq;
 import org.c4marathon.assignment.entity.EmailBox;
 import org.c4marathon.assignment.entity.EmailStatus;
@@ -11,6 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmailBoxRepository {
     private final EmailBoxJpaRepository emailBoxJpaRepository;
+    private static final int BATCH_SIZE = 500;
 
     public void postEmailBox(PostEmailBoxReq postEmailBoxReq) {
         emailBoxJpaRepository.save(EmailBox.builder()
@@ -23,7 +25,9 @@ public class EmailBoxRepository {
         return emailBoxJpaRepository.findEmailBoxesByStatus(emailStatus);
     }
 
-    public void updateStatus(EmailStatus emailStatus, List<Long> sentEmailIds) {
-        emailBoxJpaRepository.updateStatus(emailStatus, sentEmailIds);
+    public void updateStatusBySize(EmailStatus emailStatus, List<Long> sentEmailIds) {
+        ListUtils.partition(sentEmailIds, BATCH_SIZE).forEach(batch -> {
+            emailBoxJpaRepository.updateStatus(emailStatus, batch);
+        });
     }
 }

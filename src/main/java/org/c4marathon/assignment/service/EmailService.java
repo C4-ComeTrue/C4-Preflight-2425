@@ -53,7 +53,7 @@ public class EmailService {
             return;
         }
 
-        emailBoxRepository.updateStatus(EmailStatus.SUCCESS, sentEmailIds);
+        emailBoxRepository.updateStatusBySize(EmailStatus.SUCCESS, sentEmailIds);
     }
 
     public Long makeEmail(EmailBox emailBox) {
