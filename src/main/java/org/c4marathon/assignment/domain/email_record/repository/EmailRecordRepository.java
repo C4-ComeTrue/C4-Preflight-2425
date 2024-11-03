@@ -6,6 +6,6 @@ import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
 import org.c4marathon.assignment.domain.email_record.entity.EmailStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EmailRecordRepository extends JpaRepository<EmailRecord, String> {
+public interface EmailRecordRepository extends JpaRepository<EmailRecord, Long> {
 	List<EmailRecord> findAllByEmailStatus(EmailStatus emailStatus);
 }
