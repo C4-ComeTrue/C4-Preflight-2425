@@ -31,4 +31,10 @@ public class EmailRecord extends BaseEntity {
 
 	@Column(name = "content", columnDefinition = "text")
 	private String content;
+
+	public EmailRecord(Member member, String content) {
+		this.emailStatus = EmailStatus.PENDING;
+		this.member = member;
+		this.content = content;
+	}
 }
