@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 public class EmailRecordStore {
 	private final EmailRecordRepository emailRecordRepository;
 
-	public void store(EmailRecord emailRecord) {
-		emailRecordRepository.save(emailRecord);
+	public EmailRecord store(EmailRecord emailRecord) {
+		return emailRecordRepository.save(emailRecord);
 	}
 }
