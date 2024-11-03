@@ -41,4 +41,12 @@ public class EmailRecord extends BaseEntity {
 		this.content = content;
 		this.subject = subject;
 	}
+
+	public void setStatusToCompleted() {
+		this.emailStatus = EmailStatus.COMPLETED;
+	}
+
+	public void setStatusToFailed() {
+		this.emailStatus = EmailStatus.FAILED;
+	}
 }
