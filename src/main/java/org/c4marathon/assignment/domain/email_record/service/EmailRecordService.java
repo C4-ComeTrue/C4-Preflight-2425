@@ -1,7 +1,5 @@
 package org.c4marathon.assignment.domain.email_record.service;
 
-import java.util.List;
-
 import org.c4marathon.assignment.domain.email_record.dto.EmailRecordRequest;
 import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
 import org.c4marathon.assignment.domain.email_record.event.EmailRecordEvent;
