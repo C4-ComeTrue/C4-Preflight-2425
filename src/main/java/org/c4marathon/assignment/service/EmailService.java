@@ -70,7 +70,7 @@ public class EmailService {
             return emailBox.getId();
         } catch (Exception e) {
             log.error("[메일 전송 실패]: [{}], {}", emailBox.getId(), e.getMessage());
+            return null;
         }
-        return null;
     }
 }
