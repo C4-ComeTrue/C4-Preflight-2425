@@ -39,15 +39,15 @@ public class EmailService {
             return;
         }
 
-        ArrayList<CompletableFuture<Long>> futures = emailBoxes.stream()
+        List<CompletableFuture<Long>> futures = emailBoxes.stream()
                 .map(emailBox -> CompletableFuture.supplyAsync(() -> makeEmail(emailBox), asyncTaskExecutor))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .toList();
 
-        ArrayList<Long> sentEmailIds = futures.stream()
+        List<Long> sentEmailIds = futures.stream()
                 .map(CompletableFuture::join)
                 .filter(Objects::nonNull)
                 .parallel()
-                .collect(Collectors.toCollection(ArrayList::new));
+                .toList();
 
         log.debug("post email end : {}개", sentEmailIds.size());
 
