@@ -29,12 +29,16 @@ public class EmailRecord extends BaseEntity {
 	@Column(name = "email_status", columnDefinition = "varchar(10)")
 	private EmailStatus emailStatus;
 
+	@Column(name = "subject", columnDefinition = "varchar(50)")
+	private String subject;
+
 	@Column(name = "content", columnDefinition = "text")
 	private String content;
 
-	public EmailRecord(Member member, String content) {
+	public EmailRecord(Member member, String content, String subject) {
 		this.emailStatus = EmailStatus.PENDING;
 		this.member = member;
 		this.content = content;
+		this.subject = subject;
 	}
 }
