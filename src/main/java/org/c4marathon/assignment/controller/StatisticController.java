@@ -29,4 +29,12 @@ public class StatisticController {
 	) {
 		return ResponseEntity.ok(statisticService.getStatisticsByDateRange(startDate, endDate));
 	}
+
+	/**
+	 특정 날짜의 통계를 강제로 집계
+	 */
+	@GetMapping("/recalculate")
+	public ResponseEntity<StatisticRes> recalculateStatistic(@RequestParam LocalDate date) {
+		return ResponseEntity.ok(statisticService.recalculateStatistic(date));
+	}
 }
