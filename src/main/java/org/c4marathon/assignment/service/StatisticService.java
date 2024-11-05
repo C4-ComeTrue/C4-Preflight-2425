@@ -4,11 +4,14 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.c4marathon.assignment.dto.response.StatisticRes;
 import org.c4marathon.assignment.entity.Statistic;
+import org.c4marathon.assignment.entity.Transaction;
 import org.c4marathon.assignment.repository.StatisticRepository;
 import org.c4marathon.assignment.repository.TransactionRepository;
+import org.c4marathon.assignment.util.C4QueryExecuteTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -34,7 +37,7 @@ public class StatisticService {
 		Instant endInstantDate = date.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC);
 
 		Long totalRemittance = transactionRepository.sumAmountBetweenDate(startInstantDate, endInstantDate);
-		Long cumulativeRemittanceBeforeDate = transactionRepository.sumCumulativeRemittanceBeforeDate(startInstantDate);
+		Long cumulativeRemittanceBeforeDate = transactionRepository.cumulativeRemittanceBeforeDate(startInstantDate);
 
 		Statistic statistic = statisticRepository.findByStatisticDate(startInstantDate, endInstantDate)
 			.orElseGet(() -> new Statistic(startInstantDate));
