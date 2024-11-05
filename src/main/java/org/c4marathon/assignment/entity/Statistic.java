@@ -10,7 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 @Entity
 @Table(name = "statistic_nyh365")
@@ -31,4 +33,8 @@ public class Statistic extends BaseEntity {
 	@NotNull
 	@Column(nullable = false)
 	private Instant statisticDate;
+
+	public Statistic(Instant statisticDate) {
+		this.statisticDate = statisticDate;
+	}
 }
