@@ -21,4 +21,8 @@ public class StatisticRepository {
 	public Optional<Statistic> findByStatisticDate(Instant startDate, Instant endDate) {
 		return statisticJpaRepository.findByStatisticDate(startDate, endDate);
 	}
+
+	public Statistic save(Statistic statistic) {
+		return statisticJpaRepository.save(statistic);
+	}
 }
