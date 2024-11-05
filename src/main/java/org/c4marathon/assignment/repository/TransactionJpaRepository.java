@@ -14,4 +14,10 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
 		FROM Transaction t WHERE :startDate <= t.transactionDate AND t.transactionDate < :endDate
 		""")
 	Long sumAmountBetweenDate(@Param("startDate") Instant startInstantDate, @Param("endDate") Instant endInstantDate);
+
+	@Query("""
+		SELECT COALESCE(SUM(t.amount), 0)
+		FROM Transaction t WHERE t.transactionDate < :date
+		""")
+	Long sumCumulativeRemittanceBeforeDate(@Param("date") Instant date);
 }

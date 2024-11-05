@@ -16,4 +16,8 @@ public class TransactionRepository {
 	public Long sumAmountBetweenDate(Instant startInstantDate, Instant endInstantDate) {
 		return transactionJpaRepository.sumAmountBetweenDate(startInstantDate, endInstantDate);
 	}
+
+	public Long sumCumulativeRemittanceBeforeDate(Instant instantDate) {
+		return transactionJpaRepository.sumCumulativeRemittanceBeforeDate(instantDate);
+	}
 }
