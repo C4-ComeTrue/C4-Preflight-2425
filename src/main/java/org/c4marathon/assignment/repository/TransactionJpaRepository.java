@@ -1,7 +1,6 @@
 package org.c4marathon.assignment.repository;
 
 import java.time.Instant;
-import java.util.List;
 
 import org.c4marathon.assignment.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
