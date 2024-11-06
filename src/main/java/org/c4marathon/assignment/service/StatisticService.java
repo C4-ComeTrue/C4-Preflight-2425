@@ -12,6 +12,7 @@ import org.c4marathon.assignment.entity.Transaction;
 import org.c4marathon.assignment.repository.StatisticRepository;
 import org.c4marathon.assignment.repository.TransactionRepository;
 import org.c4marathon.assignment.util.C4QueryExecuteTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -55,5 +56,15 @@ public class StatisticService {
 			totalRemittance, cumulativeRemittanceBeforeDate + totalRemittance);
 
 		return new StatisticRes(statisticRepository.save(statistic));
+	}
+
+	/**
+	 * 새벽 4시마다 전날까지의 누적 송금액과 당일 총 송금액을 구한 후 통계 데이터를 업데이트한다.
+	 */
+	@Scheduled(cron = "0 0 4 * * *")
+	public void calculateYesterdayStatistic() {
+		LocalDate yesterday = LocalDate.now().minusDays(1);
+
+		recalculateStatistic(yesterday);
 	}
 }
