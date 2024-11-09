@@ -1,5 +1,7 @@
 package org.c4marathon.assignment.domain.email_record.entity;
 
+import java.util.Objects;
+
 import org.c4marathon.assignment.common.entity.BaseEntity;
 import org.c4marathon.assignment.domain.member.entity.Member;
 
@@ -49,5 +51,22 @@ public class EmailRecord extends BaseEntity {
 
 	public void setStatusToFailed() {
 		this.emailStatus = EmailStatus.FAILED;
+	}
+
+	public void setStatusToProcessing() {
+		this.emailStatus = EmailStatus.PROCESSING;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof EmailRecord emailRecord) {
+			return this.getId() == emailRecord.getId();
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this);
 	}
 }
