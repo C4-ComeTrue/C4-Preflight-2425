@@ -31,7 +31,6 @@ public class EmailRecordService {
 	@Transactional(readOnly = true)
 	public void sendEmail() {
 		emailRecordReader.findAllPending()
-			.stream()
 			.map(EmailRecordEvent::toEvent)
 			.forEach(eventPublisher::publishEvent);
 	}

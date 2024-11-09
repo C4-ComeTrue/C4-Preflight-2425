@@ -3,6 +3,7 @@ package org.c4marathon.assignment.domain.email_record.event;
 import java.util.UUID;
 
 import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
+import org.c4marathon.assignment.domain.email_record.query.EmailRecordQueryResult;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,8 @@ public class EmailRecordEvent {
 	private final String subject;
 	private final String content;
 
-	public static EmailRecordEvent toEvent(EmailRecord emailRecord) {
-		return new EmailRecordEvent(UUID.randomUUID(), emailRecord.getId(), emailRecord.getMember().getEmail(),
-			emailRecord.getSubject(), emailRecord.getContent());
+	public static EmailRecordEvent toEvent(EmailRecordQueryResult result) {
+		return new EmailRecordEvent(UUID.randomUUID(), result.getEmailRecordId(), result.getEmail(),
+			result.getSubject(), result.getContent());
 	}
 }
