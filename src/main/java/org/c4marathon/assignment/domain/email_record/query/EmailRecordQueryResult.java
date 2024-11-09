@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class EmailRecordQueryResult {
-	private Long emailRecordId;
+	private Long id;
 	private String email;
 	private String subject;
 	private String content;

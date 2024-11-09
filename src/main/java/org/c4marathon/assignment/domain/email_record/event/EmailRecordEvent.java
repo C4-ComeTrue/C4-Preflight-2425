@@ -18,7 +18,7 @@ public class EmailRecordEvent {
 	private final String content;
 
 	public static EmailRecordEvent toEvent(EmailRecordQueryResult result) {
-		return new EmailRecordEvent(UUID.randomUUID(), result.getEmailRecordId(), result.getEmail(),
+		return new EmailRecordEvent(UUID.randomUUID(), result.getId(), result.getEmail(),
 			result.getSubject(), result.getContent());
 	}
 }
