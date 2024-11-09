@@ -6,6 +6,7 @@ import org.c4marathon.assignment.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -25,7 +26,7 @@ public class EmailRecord extends BaseEntity {
 	@JoinColumn(name = "member_id", columnDefinition = "bigint", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private Member member;
 
-	@Enumerated
+	@Enumerated(EnumType.STRING)
 	@Column(name = "email_status", columnDefinition = "varchar(10)")
 	private EmailStatus emailStatus;
 
