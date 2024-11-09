@@ -15,3 +15,7 @@ spring:
       mail.smtp.ssl.enable: true
       mail.smtp.ssl.trust: ${SMTP_HOST}
       mail.smtp.starttls.enable: true
+
+api:
+  email-record:
+    base-url: ${BASE_URL}
