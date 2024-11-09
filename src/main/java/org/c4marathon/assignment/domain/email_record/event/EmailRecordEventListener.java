@@ -43,13 +43,11 @@ public class EmailRecordEventListener {
 
 			javaMailSender.send(message);
 
+			emailRecord.setStatusToCompleted();
+
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-		} finally {
-			log.error("이메일 전송에 실패했습니다.");
 			emailRecord.setStatusToFailed();
 		}
-
-		emailRecord.setStatusToCompleted();
 	}
 }
