@@ -1,7 +1,6 @@
 package org.c4marathon.assignment.common.entity;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -27,18 +26,4 @@ public abstract class BaseEntity {
 	@LastModifiedDate
 	@Column(name = "modified_date", columnDefinition = "datetime")
 	private LocalDateTime modifiedDate;
-
-	@Override
-	public boolean equals(Object o) {
-		if (o == null || getClass() != o.getClass()){
-			return false;
-		}
-		BaseEntity other = (BaseEntity) o;
-		return Objects.equals(this.id, other.id);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
 }
