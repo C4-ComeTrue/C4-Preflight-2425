@@ -26,7 +26,6 @@ public interface EmailRecordRepository extends JpaRepository<EmailRecord, Long> 
 	@QueryHints(value = {
 		@QueryHint(name = HINT_FETCH_SIZE, value = "" + Integer.MAX_VALUE),
 		@QueryHint(name = HINT_CACHEABLE, value = "false"),
-		@QueryHint(name = HINT_READ_ONLY, value = "true"),
 	})
 	Stream<EmailRecordQueryResult> findAllByEmailStatus(@Param("status") EmailStatus emailStatus);
 }
