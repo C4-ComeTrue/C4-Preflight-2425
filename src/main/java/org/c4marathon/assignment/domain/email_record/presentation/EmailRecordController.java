@@ -2,7 +2,7 @@ package org.c4marathon.assignment.domain.email_record.presentation;
 
 import java.net.URI;
 
-import org.c4marathon.assignment.domain.email_record.dto.EmailRecordRequest;
+import org.c4marathon.assignment.domain.email_record.dto.SaveEmailRecordRequest;
 import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
 import org.c4marathon.assignment.domain.email_record.service.EmailRecordService;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +25,7 @@ public class EmailRecordController {
 	private String baseUrl;
 
 	@PostMapping("/v1/email-records")
-	public ResponseEntity<EmailRecord> saveEmailRecord(@Valid EmailRecordRequest.Save request) {
+	public ResponseEntity<EmailRecord> saveEmailRecord(@Valid SaveEmailRecordRequest request) {
 		EmailRecord saved = emailRecordService.save(request);
 		URI uri = UriComponentsBuilder.fromUriString(baseUrl + saved.getId())
 			.build()
