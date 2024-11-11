@@ -2,11 +2,7 @@ package org.c4marathon.assignment.domain.email_record.service;
 
 import static org.c4marathon.assignment.common.configuration.AsyncConfig.*;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import org.c4marathon.assignment.domain.email_record.dto.EmailRecordRequest;
+import org.c4marathon.assignment.domain.email_record.dto.SaveEmailRecordRequest;
 import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
 import org.c4marathon.assignment.domain.email_record.event.EmailRecordEvent;
 import org.c4marathon.assignment.domain.email_record.query.EmailRecordQueryResult;
@@ -30,7 +26,7 @@ public class EmailRecordService {
 	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
-	public EmailRecord save(EmailRecordRequest.Save request) {
+	public EmailRecord save(SaveEmailRecordRequest request) {
 		var member = memberReader.find(request.memberId());
 		return emailRecordStore.store(request.toEntity(member));
 	}
