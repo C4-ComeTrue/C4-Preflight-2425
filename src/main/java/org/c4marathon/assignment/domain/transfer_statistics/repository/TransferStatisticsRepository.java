@@ -3,6 +3,7 @@ package org.c4marathon.assignment.domain.transfer_statistics.repository;
 import static org.hibernate.jpa.HibernateHints.*;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.c4marathon.assignment.domain.transfer_statistics.entity.TransferStatistics;
@@ -25,4 +26,6 @@ public interface TransferStatisticsRepository extends JpaRepository<TransferStat
 		@QueryHint(name = HINT_CACHEABLE, value = "false"),
 	})
 	Stream<TransferStatistics> findAllByUnitDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+	Optional<TransferStatistics> findByUnitDate(LocalDate date);
 }
