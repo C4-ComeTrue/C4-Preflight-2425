@@ -3,8 +3,10 @@ package org.c4marathon.assignment.domain.transfer_statistics.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.c4marathon.assignment.common.entity.BaseEntity;
+import org.c4marathon.assignment.domain.transaction.entity.Transaction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,6 +28,14 @@ public class TransferStatistics extends BaseEntity {
 
 	@Column(name = "unit_date", columnDefinition = "timestamp")
 	private LocalDateTime unitDate;
+
+	public TransferStatistics(Stream<Transaction> transactions, TransferStatistics transferStatistics) {
+		BigDecimal currentDailyTotal = transactions.map(Transaction::getAmount)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal previousCumulativeTotal = transferStatistics.getCumulativeTotalAmount();
+		this.dailyTotalAmount = currentDailyTotal;
+		this.cumulativeTotalAmount = previousCumulativeTotal.add(currentDailyTotal);
+	}
 
 	@Override
 	public boolean equals(Object o) {
