@@ -24,7 +24,7 @@ public class Transaction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "transaction_id") // 여기서 컬럼명을 "transaction_id"로 변경
-	private Long id;
+	private Integer id;
 
 	@Column(name = "sender_account", columnDefinition = "varchar(20)", nullable = false)
 	private String senderAccount;
