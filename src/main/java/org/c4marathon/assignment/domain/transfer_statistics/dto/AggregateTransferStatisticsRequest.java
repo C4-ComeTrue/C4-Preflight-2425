@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 
-public record GetTransferStatisticsRequest(
+public record AggregateTransferStatisticsRequest(
 	@NotBlank
 	@PastOrPresent
 	LocalDateTime targetDate

@@ -1,13 +1,11 @@
 package org.c4marathon.assignment.domain.transfer_statistics.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
-import org.c4marathon.assignment.domain.transaction.entity.Transaction;
 import org.c4marathon.assignment.domain.transaction.repository.TransactionReader;
-import org.c4marathon.assignment.domain.transfer_statistics.dto.GetTransferStatisticsRequest;
+import org.c4marathon.assignment.domain.transfer_statistics.dto.GetAllTransferStatisticsRequest;
+import org.c4marathon.assignment.domain.transfer_statistics.dto.AggregateTransferStatisticsRequest;
 import org.c4marathon.assignment.domain.transfer_statistics.entity.TransferStatistics;
 import org.c4marathon.assignment.domain.transfer_statistics.repository.TransferStatisticsReader;
 import org.c4marathon.assignment.domain.transfer_statistics.repository.TransferStatisticsStore;
@@ -25,8 +23,8 @@ public class TransferStatisticsService {
 	private final TransactionReader transactionReader;
 
 	@Transactional(readOnly = true)
-	public List<TransferStatistics> findAllByUnitDateBetween(LocalDateTime startDate, LocalDateTime endDate) {
-		return transferStatisticsReader.findAllByUnitDateBetween(startDate.toLocalDate(), endDate.toLocalDate())
+	public List<TransferStatistics> findAllByUnitDateBetween(GetAllTransferStatisticsRequest request) {
+		return transferStatisticsReader.findAllByUnitDateBetween(request.startDate(), request.endDate())
 			.toList();
 	}
 
@@ -40,7 +38,7 @@ public class TransferStatisticsService {
 	}
 
 	@Transactional
-	public TransferStatistics getStatistics(GetTransferStatisticsRequest request) {
+	public TransferStatistics getStatistics(AggregateTransferStatisticsRequest request) {
 		var targetDate = request.targetDate().toLocalDate();
 
 		var transferStatistics = transferStatisticsReader.findByUnitDate(targetDate);
