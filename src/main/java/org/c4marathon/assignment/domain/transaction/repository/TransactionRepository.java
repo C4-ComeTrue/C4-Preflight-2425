@@ -1,6 +1,6 @@
 package org.c4marathon.assignment.domain.transaction.repository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import org.c4marathon.assignment.domain.transaction.entity.Transaction;
@@ -14,5 +14,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 			SELECT t FROM Transaction t 
 			WHERE t.transactionType = :type AND t.createdDate = :date
 			""")
-	Stream<Transaction> findAllTransactionByTransactionTypeAndCreatedDate(TransactionType type, LocalDateTime date);
+	Stream<Transaction> findAllTransactionByTransactionTypeAndCreatedDate(TransactionType type, LocalDate date);
 }
