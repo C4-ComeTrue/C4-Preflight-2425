@@ -15,6 +15,9 @@ spring:
       mail.smtp.ssl.enable: true
       mail.smtp.ssl.trust: ${SMTP_HOST}
       mail.smtp.starttls.enable: true
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 api:
   email-record:
