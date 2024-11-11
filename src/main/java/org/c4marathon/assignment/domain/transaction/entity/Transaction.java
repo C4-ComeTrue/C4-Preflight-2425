@@ -8,6 +8,9 @@ import org.hibernate.annotations.ColumnDefault;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,7 +20,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "transaction", indexes = {})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Transaction extends BaseEntity {
+public class Transaction {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "transaction_id") // 여기서 컬럼명을 "transaction_id"로 변경
+	private Long id;
+
 	@Column(name = "sender_account", columnDefinition = "varchar(20)", nullable = false)
 	private String senderAccount;
 
