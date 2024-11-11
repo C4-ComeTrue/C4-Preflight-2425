@@ -3,8 +3,7 @@ package org.c4marathon.assignment.domain.transaction.repository;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
-import org.c4marathon.assignment.domain.transaction.entity.Transaction;
-import org.c4marathon.assignment.domain.transaction.entity.TransactionType;
+import org.c4marathon.assignment.domain.transfer_statistics.entity.TransferStatistics;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class TransactionReader {
 	private final TransactionRepository transactionRepository;
 
-	public Stream<Transaction> findAllTransfersByDate(LocalDate date) {
-		return transactionRepository.findAllTransactionByTransactionTypeAndCreatedDate(TransactionType.TRANSFER, date);
+	public Stream<TransferStatistics> findTransferStatisticsBetweeen(LocalDate from, LocalDate to) {
+		return transactionRepository.findTransactionBetween(from, to);
 	}
 }
