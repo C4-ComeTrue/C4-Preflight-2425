@@ -19,7 +19,7 @@ public interface EmailRecordRepository extends JpaRepository<EmailRecord, Long> 
 		"""
 			SELECT new org.c4marathon.assignment.domain.email_record.query.EmailRecordQueryResult(er.id, er.member.email, er.subject, er.content) 
 			FROM EmailRecord er 
-			LEFT JOIN FETCH er.member
+			LEFT JOIN er.member
 			WHERE er.emailStatus =:status
 			ORDER BY er.id ASC
 			""")
