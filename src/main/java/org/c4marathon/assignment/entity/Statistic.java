@@ -38,9 +38,4 @@ public class Statistic extends BaseEntity {
 	public Statistic(Instant statisticDate) {
 		this.statisticDate = statisticDate;
 	}
-
-	public void changeStatistic(Long totalRemittance, long cumulativeRemittance) {
-		this.totalRemittance = totalRemittance;
-		this.cumulativeRemittance = cumulativeRemittance;
-	}
 }
