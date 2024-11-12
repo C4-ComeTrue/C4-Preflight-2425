@@ -50,7 +50,11 @@ public class StatisticService {
 			.ifPresent(statisticRepository::delete);
 
 		return new StatisticRes(
-			statisticRepository.save(new Statistic(totalRemittance, cumulativeRemittanceBeforeDate + totalRemittance)));
+			statisticRepository.save(Statistic.builder()
+				.totalRemittance(totalRemittance)
+				.cumulativeRemittance(cumulativeRemittanceBeforeDate + totalRemittance)
+				.statisticDate(startInstantDate)
+				.build()));
 	}
 
 	/**

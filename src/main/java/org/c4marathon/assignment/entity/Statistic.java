@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -39,8 +40,10 @@ public class Statistic extends BaseEntity {
 		this.statisticDate = statisticDate;
 	}
 
-	public Statistic(Long totalRemittance, Long cumulativeRemittance) {
+	@Builder
+	public Statistic(Long totalRemittance, Long cumulativeRemittance, Instant statisticDate) {
 		this.totalRemittance = totalRemittance;
 		this.cumulativeRemittance = cumulativeRemittance;
+		this.statisticDate = statisticDate;
 	}
 }
