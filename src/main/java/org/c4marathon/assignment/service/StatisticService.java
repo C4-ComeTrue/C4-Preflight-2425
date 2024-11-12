@@ -46,13 +46,11 @@ public class StatisticService {
 		Long totalRemittance = transactionRepository.sumAmountBetweenDate(startInstantDate, endInstantDate);
 		Long cumulativeRemittanceBeforeDate = transactionRepository.cumulativeRemittanceBeforeDate(startInstantDate);
 
-		Statistic statistic = statisticRepository.findByStatisticDate(startInstantDate, endInstantDate)
-			.orElseGet(() -> new Statistic(startInstantDate));
+		statisticRepository.findByStatisticDate(startInstantDate, endInstantDate)
+			.ifPresent(statisticRepository::delete);
 
-		statistic.changeStatistic(
-			totalRemittance, cumulativeRemittanceBeforeDate + totalRemittance);
-
-		return new StatisticRes(statisticRepository.save(statistic));
+		return new StatisticRes(
+			statisticRepository.save(new Statistic(totalRemittance, cumulativeRemittanceBeforeDate + totalRemittance)));
 	}
 
 	/**
