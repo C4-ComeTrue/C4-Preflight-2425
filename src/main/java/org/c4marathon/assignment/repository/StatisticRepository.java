@@ -25,4 +25,8 @@ public class StatisticRepository {
 	public Statistic save(Statistic statistic) {
 		return statisticJpaRepository.save(statistic);
 	}
+
+	public void delete(Statistic statistic) {
+		statisticJpaRepository.delete(statistic);
+	}
 }
