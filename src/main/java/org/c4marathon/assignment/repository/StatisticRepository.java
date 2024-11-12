@@ -15,11 +15,11 @@ public class StatisticRepository {
 	private final StatisticJpaRepository statisticJpaRepository;
 
 	public List<Statistic> findAllByStatisticDateBetween(Instant startDate, Instant endDate) {
-		return statisticJpaRepository.findAllByStatisticDateBetween(startDate, endDate);
+		return statisticJpaRepository.findAllByStatisticDateGreaterThanEqualAndStatisticDateBefore(startDate, endDate);
 	}
 
 	public Optional<Statistic> findByStatisticDate(Instant startDate, Instant endDate) {
-		return statisticJpaRepository.findByStatisticDate(startDate, endDate);
+		return statisticJpaRepository.findByStatisticDateGreaterThanEqualAndStatisticDateBefore(startDate, endDate);
 	}
 
 	public Statistic save(Statistic statistic) {
