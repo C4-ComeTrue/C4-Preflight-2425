@@ -24,4 +24,14 @@ public class TransactionRepository {
 	public List<Transaction> findAllTransaction(String account) {
 		return transactionJpaRepository.findAllTransaction(account);
 	}
+
+	public List<Transaction> findTransactionByAccountNumberAndLastTransactionId(String accountNumber,
+		Integer lastTransactionId, int limit) {
+		if (lastTransactionId == null) {
+			return transactionJpaRepository.findTransaction(accountNumber, limit);
+		}
+
+		return transactionJpaRepository.findTransactionByAccountNumberAndLastTransactionId(accountNumber,
+			lastTransactionId, limit);
+	}
 }
