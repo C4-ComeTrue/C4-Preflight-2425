@@ -1,7 +1,9 @@
 package org.c4marathon.assignment.repository;
 
 import java.time.Instant;
+import java.util.List;
 
+import org.c4marathon.assignment.entity.Transaction;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,5 +19,9 @@ public class TransactionRepository {
 
 	public Long cumulativeRemittanceBeforeDate(Instant instantDate) {
 		return transactionJpaRepository.cumulativeRemittanceBeforeDate(instantDate);
+	}
+
+	public List<Transaction> findAllTransaction(String account) {
+		return transactionJpaRepository.findAllTransaction(account);
 	}
 }
