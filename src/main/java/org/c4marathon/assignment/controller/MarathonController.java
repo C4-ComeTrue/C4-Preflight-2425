@@ -16,7 +16,7 @@ public class MarathonController {
 	private final MarathonService marathonService;
 
 	@GetMapping("/all-info")
-	public FinancialInfoRes getAllInfo(@RequestParam String email) {
-		return marathonService.getAllInfo(email);
+	public FinancialInfoRes getAllInfoWithLimit(@RequestParam String email) {
+		return marathonService.getAllInfoWithLimit(email);
 	}
 }
