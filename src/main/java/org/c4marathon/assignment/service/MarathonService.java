@@ -2,8 +2,6 @@ package org.c4marathon.assignment.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.Executor;
 
 import org.c4marathon.assignment.core.C4ThreadPoolExecutor;
 import org.c4marathon.assignment.dto.response.AccountRes;
