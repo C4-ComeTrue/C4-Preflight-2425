@@ -2,6 +2,7 @@ package org.c4marathon.assignment.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 
 import org.c4marathon.assignment.core.C4ThreadPoolExecutor;
@@ -54,5 +55,34 @@ public class MarathonService {
 		threadPoolExecutor.waitToEnd();
 
 		return new FinancialInfoRes(accountResList, transactionResList);
+	}
+
+	public FinancialInfoRes getAllInfoNotParallel(String email) {
+		User user = userRepository.findUserByEmail(email)
+			.orElseThrow(() -> new BadRequestException("존재하지 않는 회원입니다."));
+
+		List<AccountRes> accountResList = accountRepository.findAllAccountByUserId(user.getId())
+			.stream().map(AccountRes::new).toList();
+
+		List<List<TransactionRes>> transactionRes = accountResList.stream()
+			.map(accountRes -> {
+				List<TransactionRes> transactionResList = new ArrayList<>();
+
+				C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursor(LIMIT_SIZE,
+					lastTransaction -> transactionRepository.findTransactionByAccountNumberAndLastTransactionId(
+						accountRes.accountNumber(), lastTransaction == null ? null : lastTransaction.getId(),
+						LIMIT_SIZE),
+					transactions -> transactionResList.addAll(
+						transactions.stream().map(TransactionRes::new).toList())
+				);
+				return transactionResList;
+			})
+			.toList();
+
+		List<TransactionRes> transactions = transactionRes.stream()
+			.flatMap(List::stream)
+			.toList();
+
+		return new FinancialInfoRes(accountResList, transactions);
 	}
 }

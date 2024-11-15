@@ -19,4 +19,9 @@ public class MarathonController {
 	public FinancialInfoRes getAllInfoWithLimit(@RequestParam String email) {
 		return marathonService.getAllInfoWithLimit(email);
 	}
+
+	@GetMapping("/all-info-not-parallel")
+	public FinancialInfoRes getAllInfoNotParallel(@RequestParam String email) {
+		return marathonService.getAllInfoNotParallel(email);
+	}
 }
