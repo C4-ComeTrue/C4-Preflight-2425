@@ -2,8 +2,6 @@ package org.c4marathon.assignment.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 import org.c4marathon.assignment.core.C4ThreadPoolExecutor;
@@ -29,7 +27,6 @@ public class MarathonService {
 	public static final int MAX_POOL_SIZE = 32;
 	private final UserRepository userRepository;
 	private final AccountRepository accountRepository;
-	private final Executor asyncTaskExecutor;
 	private final TransactionRepository transactionRepository;
 	private final C4ThreadPoolExecutor threadPoolExecutor = new C4ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE);
 
