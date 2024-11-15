@@ -19,9 +19,9 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
 	@Query("""
 		SELECT COALESCE(SUM(t.amount), 0)
 		FROM Transaction t WHERE t.id <= (
-								  SELECT MAX(t.id)
-								  FROM Transaction t WHERE t.transactionDate <= :date
-					  			)
+		  SELECT MAX(t.id)
+		  FROM Transaction t WHERE t.transactionDate <= :date
+		)
 		""")
 	Long cumulativeRemittanceBeforeDate(@Param("date") Instant date);
 
