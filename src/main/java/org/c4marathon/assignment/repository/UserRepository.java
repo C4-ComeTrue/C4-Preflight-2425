@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 public class UserRepository {
 	private final UserJpaRepository userJpaRepository;
 
-	public Optional<User> findUserByEmail(String email) {
-		return userJpaRepository.findByEmail(email);
+	public Optional<User> findUserById(Integer id) {
+		return userJpaRepository.findById(id);
 	}
 }

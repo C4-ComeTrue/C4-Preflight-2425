@@ -16,12 +16,12 @@ public class MarathonController {
 	private final MarathonService marathonService;
 
 	@GetMapping("/all-info")
-	public FinancialInfoRes getAllInfoWithLimit(@RequestParam String email) {
-		return marathonService.getAllInfoWithLimit(email);
+	public FinancialInfoRes getAllInfoWithLimit(@RequestParam Integer id) {
+		return marathonService.getAllInfoWithLimit(id);
 	}
 
 	@GetMapping("/all-info-not-parallel")
-	public FinancialInfoRes getAllInfoNotParallel(@RequestParam String email) {
-		return marathonService.getAllInfoNotParallel(email);
+	public FinancialInfoRes getAllInfoNotParallel(@RequestParam Integer id) {
+		return marathonService.getAllInfoNotParallel(id);
 	}
 }

@@ -31,8 +31,8 @@ public class MarathonService {
 	private final TransactionRepository transactionRepository;
 	private final C4ThreadPoolExecutor threadPoolExecutor = new C4ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE);
 
-	public FinancialInfoRes getAllInfoWithLimit(String email) {
-		User user = userRepository.findUserByEmail(email)
+	public FinancialInfoRes getAllInfoWithLimit(Integer userId) {
+		User user = userRepository.findUserById(userId)
 			.orElseThrow(() -> new BadRequestException("존재하지 않는 회원입니다."));
 
 		List<AccountRes> accountResList = accountRepository.findAllAccountByUserId(user.getId())
@@ -57,8 +57,8 @@ public class MarathonService {
 		return new FinancialInfoRes(accountResList, transactionResList);
 	}
 
-	public FinancialInfoRes getAllInfoNotParallel(String email) {
-		User user = userRepository.findUserByEmail(email)
+	public FinancialInfoRes getAllInfoNotParallel(Integer userId) {
+		User user = userRepository.findUserById(userId)
 			.orElseThrow(() -> new BadRequestException("존재하지 않는 회원입니다."));
 
 		List<AccountRes> accountResList = accountRepository.findAllAccountByUserId(user.getId())
