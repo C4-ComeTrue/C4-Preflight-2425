@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import org.c4marathon.assignment.core.C4ThreadPoolExecutor;
 import org.c4marathon.assignment.dto.response.AccountRes;
 import org.c4marathon.assignment.dto.response.FinancialInfoRes;
 import org.c4marathon.assignment.dto.response.TransactionRes;
@@ -24,10 +25,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MarathonService {
 	public static final int LIMIT_SIZE = 1000;
+	public static final int CORE_POOL_SIZE = 8;
+	public static final int MAX_POOL_SIZE = 32;
 	private final UserRepository userRepository;
 	private final AccountRepository accountRepository;
 	private final Executor asyncTaskExecutor;
 	private final TransactionRepository transactionRepository;
+	private final C4ThreadPoolExecutor threadPoolExecutor = new C4ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE);
 
 	public FinancialInfoRes getAllInfoWithLimit(String email) {
 		User user = userRepository.findUserByEmail(email)
@@ -36,28 +40,22 @@ public class MarathonService {
 		List<AccountRes> accountResList = accountRepository.findAllAccountByUserId(user.getId())
 			.stream().map(AccountRes::new).toList();
 
-		List<CompletableFuture<List<TransactionRes>>> futures = accountResList.stream()
-			.map(accountRes -> CompletableFuture.supplyAsync(() -> {
-				List<TransactionRes> transactionResList = new ArrayList<>();
+		List<TransactionRes> transactionResList = new ArrayList<>();
 
-				C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursor(LIMIT_SIZE,
-					lastTransaction -> transactionRepository.findTransactionByAccountNumberAndLastTransactionId(
-						accountRes.accountNumber(), lastTransaction == null ? null : lastTransaction.getId(),
-						LIMIT_SIZE),
-					transactions -> transactionResList.addAll(
-						transactions.stream().map(TransactionRes::new).toList())
-				);
+		threadPoolExecutor.init();
 
-				return transactionResList;
-			}, asyncTaskExecutor))
-			.toList();
+		accountResList.forEach(accountRes -> threadPoolExecutor.execute(() -> {
+			C4QueryExecuteTemplate.<Transaction>selectAndExecuteWithCursor(LIMIT_SIZE,
+				lastTransaction -> transactionRepository.findTransactionByAccountNumberAndLastTransactionId(
+					accountRes.accountNumber(), lastTransaction == null ? null : lastTransaction.getId(),
+					LIMIT_SIZE),
+				transactions -> transactionResList.addAll(
+					transactions.stream().map(TransactionRes::new).toList())
+			);
+		}));
 
-		List<TransactionRes> transactions = futures.stream()
-			.map(CompletableFuture::join)
-			.filter(Objects::nonNull)
-			.flatMap(List::stream)
-			.toList();
+		threadPoolExecutor.waitToEnd();
 
-		return new FinancialInfoRes(accountResList, transactions);
+		return new FinancialInfoRes(accountResList, transactionResList);
 	}
 }
