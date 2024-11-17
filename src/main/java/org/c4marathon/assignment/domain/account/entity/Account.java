@@ -32,7 +32,7 @@ public class Account {
 	private Integer userId;
 
 	@Column(name = "account_type", columnDefinition = "char")
-	private String accountType;
+	private Character accountType;
 
 	@Column(name = "memo", columnDefinition = "varchar(200)")
 	private String memo;
