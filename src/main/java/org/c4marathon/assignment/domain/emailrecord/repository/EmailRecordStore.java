@@ -1,6 +1,6 @@
-package org.c4marathon.assignment.domain.email_record.repository;
+package org.c4marathon.assignment.domain.emailrecord.repository;
 
-import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
+import org.c4marathon.assignment.domain.emailrecord.entity.EmailRecord;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;

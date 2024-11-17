@@ -1,10 +1,10 @@
-package org.c4marathon.assignment.domain.email_record.repository;
+package org.c4marathon.assignment.domain.emailrecord.repository;
 
 import java.util.stream.Stream;
 
-import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
-import org.c4marathon.assignment.domain.email_record.entity.EmailStatus;
-import org.c4marathon.assignment.domain.email_record.query.EmailRecordQueryResult;
+import org.c4marathon.assignment.domain.emailrecord.entity.EmailRecord;
+import org.c4marathon.assignment.domain.emailrecord.entity.EmailStatus;
+import org.c4marathon.assignment.domain.emailrecord.query.EmailRecordQueryResult;
 import org.springframework.stereotype.Component;
 
 import jakarta.persistence.EntityNotFoundException;

@@ -1,9 +1,8 @@
-package org.c4marathon.assignment.domain.email_record.event;
+package org.c4marathon.assignment.domain.emailrecord.event;
 
 import java.util.UUID;
 
-import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
-import org.c4marathon.assignment.domain.email_record.query.EmailRecordQueryResult;
+import org.c4marathon.assignment.domain.emailrecord.query.EmailRecordQueryResult;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,12 +1,12 @@
-package org.c4marathon.assignment.domain.email_record.repository;
+package org.c4marathon.assignment.domain.emailrecord.repository;
 
 import static org.hibernate.jpa.HibernateHints.*;
 
 import java.util.stream.Stream;
 
-import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
-import org.c4marathon.assignment.domain.email_record.entity.EmailStatus;
-import org.c4marathon.assignment.domain.email_record.query.EmailRecordQueryResult;
+import org.c4marathon.assignment.domain.emailrecord.entity.EmailRecord;
+import org.c4marathon.assignment.domain.emailrecord.entity.EmailStatus;
+import org.c4marathon.assignment.domain.emailrecord.query.EmailRecordQueryResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
@@ -17,7 +17,7 @@ import jakarta.persistence.QueryHint;
 public interface EmailRecordRepository extends JpaRepository<EmailRecord, Long> {
 	@Query(
 		"""
-			SELECT new org.c4marathon.assignment.domain.email_record.query.EmailRecordQueryResult(er.id, er.member.email, er.subject, er.content) 
+			SELECT new org.c4marathon.assignment.domain.emailrecord.query.EmailRecordQueryResult(er.id, er.member.email, er.subject, er.content) 
 			FROM EmailRecord er 
 			LEFT JOIN FETCH er.member
 			WHERE er.emailStatus =:status

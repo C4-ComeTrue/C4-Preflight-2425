@@ -1,10 +1,10 @@
-package org.c4marathon.assignment.domain.email_record.presentation;
+package org.c4marathon.assignment.domain.emailrecord.presentation;
 
 import java.net.URI;
 
-import org.c4marathon.assignment.domain.email_record.dto.SaveEmailRecordRequest;
-import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
-import org.c4marathon.assignment.domain.email_record.service.EmailRecordService;
+import org.c4marathon.assignment.domain.emailrecord.dto.SaveEmailRecordRequest;
+import org.c4marathon.assignment.domain.emailrecord.entity.EmailRecord;
+import org.c4marathon.assignment.domain.emailrecord.service.EmailRecordService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

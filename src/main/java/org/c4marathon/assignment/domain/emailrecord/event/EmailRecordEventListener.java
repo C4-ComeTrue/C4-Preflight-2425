@@ -1,8 +1,8 @@
-package org.c4marathon.assignment.domain.email_record.event;
+package org.c4marathon.assignment.domain.emailrecord.event;
 
 import static org.c4marathon.assignment.common.configuration.AsyncConfig.*;
 
-import org.c4marathon.assignment.domain.email_record.repository.EmailRecordReader;
+import org.c4marathon.assignment.domain.emailrecord.repository.EmailRecordReader;
 import org.springframework.context.event.EventListener;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;

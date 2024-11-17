@@ -1,6 +1,6 @@
-package org.c4marathon.assignment.domain.email_record.dto;
+package org.c4marathon.assignment.domain.emailrecord.dto;
 
-import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
+import org.c4marathon.assignment.domain.emailrecord.entity.EmailRecord;
 import org.c4marathon.assignment.domain.member.entity.Member;
 
 import jakarta.validation.constraints.NotBlank;

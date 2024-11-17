@@ -1,4 +1,4 @@
-package org.c4marathon.assignment.domain.email_record.entity;
+package org.c4marathon.assignment.domain.emailrecord.entity;
 
 import java.util.Objects;
 

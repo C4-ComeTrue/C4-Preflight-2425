@@ -1,13 +1,13 @@
-package org.c4marathon.assignment.domain.email_record.service;
+package org.c4marathon.assignment.domain.emailrecord.service;
 
 import static org.c4marathon.assignment.common.configuration.AsyncConfig.*;
 
-import org.c4marathon.assignment.domain.email_record.dto.SaveEmailRecordRequest;
-import org.c4marathon.assignment.domain.email_record.entity.EmailRecord;
-import org.c4marathon.assignment.domain.email_record.event.EmailRecordEvent;
-import org.c4marathon.assignment.domain.email_record.query.EmailRecordQueryResult;
-import org.c4marathon.assignment.domain.email_record.repository.EmailRecordReader;
-import org.c4marathon.assignment.domain.email_record.repository.EmailRecordStore;
+import org.c4marathon.assignment.domain.emailrecord.dto.SaveEmailRecordRequest;
+import org.c4marathon.assignment.domain.emailrecord.entity.EmailRecord;
+import org.c4marathon.assignment.domain.emailrecord.event.EmailRecordEvent;
+import org.c4marathon.assignment.domain.emailrecord.query.EmailRecordQueryResult;
+import org.c4marathon.assignment.domain.emailrecord.repository.EmailRecordReader;
+import org.c4marathon.assignment.domain.emailrecord.repository.EmailRecordStore;
 import org.c4marathon.assignment.domain.member.repository.MemberReader;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;

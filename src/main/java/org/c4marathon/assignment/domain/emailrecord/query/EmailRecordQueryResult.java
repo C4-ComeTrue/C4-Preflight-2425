@@ -1,4 +1,4 @@
-package org.c4marathon.assignment.domain.email_record.query;
+package org.c4marathon.assignment.domain.emailrecord.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
