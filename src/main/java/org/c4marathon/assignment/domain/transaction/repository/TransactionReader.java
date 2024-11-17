@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class TransactionReader {
 	private final TransactionRepository transactionRepository;
 
-	public List<Transaction> findAllTransactionsBySenderName(String senderName, Pageable pageable) {
-		return transactionRepository.findAllBySenderAccountOrderByTransactionDateDesc(senderName, pageable);
+	public List<Transaction> findAllTransactionsBySenderName(String senderName) {
+		return transactionRepository.findAllBySenderAccountOrderByTransactionDateDesc(senderName);
 	}
 }
