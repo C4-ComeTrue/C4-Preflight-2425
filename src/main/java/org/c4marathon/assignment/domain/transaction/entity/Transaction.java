@@ -51,4 +51,7 @@ public class Transaction {
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	@Column(name = "transaction_date", nullable = false)
 	private LocalDateTime transactionDate;
+
+	@Column(name = "created_date", nullable = false)
+	private LocalDateTime createdDate;
 }
