@@ -43,8 +43,8 @@ public class Account {
 
 	@CreatedDate
 	@ColumnDefault("CURRENT_TIMESTAMP")
-	@Column(name = "created_date", columnDefinition = "timestamp")
-	private LocalDateTime createdDate;
+	@Column(name = "create_date", columnDefinition = "timestamp")
+	private LocalDateTime createDate;
 
 	@Column(name = "recent_transaction_date", columnDefinition = "timestamp")
 	private LocalDateTime recentTransactionDate;
