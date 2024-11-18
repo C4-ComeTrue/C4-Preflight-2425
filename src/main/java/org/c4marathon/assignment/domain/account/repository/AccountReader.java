@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class AccountReader {
 	private final AccountRepository accountRepository;
 
-	List<Account> findAllAccountsByUserId(Integer userId, Pageable pageable) {
+	public List<Account> findAllAccountsByUserId(Integer userId, Pageable pageable) {
 		return accountRepository.findByUserId(userId, pageable);
 	}
 }
