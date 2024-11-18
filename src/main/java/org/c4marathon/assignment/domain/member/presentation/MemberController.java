@@ -24,14 +24,14 @@ public class MemberController {
 	@GetMapping("/v1/members/{memberId}/parallel")
 	public ResponseEntity<List<TransactionAccountResponse>> findTransactionAccountInfoParallel(
 		@PathVariable("memberId") Integer memberId,
-		@PageableDefault(size = 10, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
+		@PageableDefault(size = 100, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
 		return ResponseEntity.ok(memberService.findTransactionAccountInfoParallel(memberId, pageable));
 	}
 
 	@GetMapping("/v1/members/{memberId}")
 	public ResponseEntity<List<TransactionAccountResponse>> findTransactionAccountInfo(
 		@PathVariable("memberId") Integer memberId,
-		@PageableDefault(size = 10, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
+		@PageableDefault(size = 100, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
 		return ResponseEntity.ok(memberService.findTransactionAccountInfo(memberId, pageable));
 	}
 }
