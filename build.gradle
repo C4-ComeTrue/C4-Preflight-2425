@@ -35,8 +35,6 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'com.mysql:mysql-connector-j'
     implementation 'io.netty:netty-codec-http:4.1.0.Final'
-
-    gatlingImplementation 'io.netty:netty-codec-http:4.1.107.Final'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
